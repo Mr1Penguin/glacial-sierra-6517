@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'materialize',
+    'jquery',
+    'material',
     'bootstrap3',
     'reader',
 )
@@ -85,7 +86,6 @@ DATABASES = {
 }
 
 BOOTSTRAP3 = {
-    'jquery_url': '//code.jquery.com/jquery.min.js',
     'set_placeholder': False,
 }
 

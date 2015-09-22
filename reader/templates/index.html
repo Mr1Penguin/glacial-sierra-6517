@@ -3,15 +3,17 @@
   <head>
     {% load bootstrap3 %}
     {% load staticfiles %}
-    <!--Import materialize.css-->
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js" />
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
+    {% include 'material/includes/material_css.html' %}
+    {% include 'material/includes/material_js.html' %}
+    {% load material_form %}
   </head>
   <body>
     
 	
-    <form action="/url/to/submit/" method="post" class="form">
+    <form action="/" method="post" class="form">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}
@@ -24,7 +26,6 @@
     <!--Import jQuery before materialize.js-->
     {% block footer %}
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
     {% endblock %}    
   </body>
 </html>
