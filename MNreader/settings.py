@@ -84,6 +84,11 @@ DATABASES = {
     }
 }
 
+BOOTSTRAP3 = {
+    'jquery_url': '//code.jquery.com/jquery.min.js',
+    'set_placeholder': False,
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
