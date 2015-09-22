@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load bootstrap3 %}
+    {% load staticfiles %}
+    <!--Import materialize.css-->
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
+  </head>
+  <body>
+    
+	
+    <form action="/url/to/submit/" method="post" class="form">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "user" %} Log in
+        </button>
+    {% endbuttons %}
+    </form>
+        
+    <!--Import jQuery before materialize.js-->
+    {% block footer %}
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
+    {% endblock %}    
+  </body>
+</html>

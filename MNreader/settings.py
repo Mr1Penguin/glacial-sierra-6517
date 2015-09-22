@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'materialize',
     'bootstrap3',
+    'reader',
 )
 
 MIDDLEWARE_CLASSES = (
