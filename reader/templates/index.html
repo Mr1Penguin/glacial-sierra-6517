@@ -3,26 +3,45 @@
   <head>
     {% load bootstrap3 %}
     {% load staticfiles %}
-
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
   </head>
   <body>
     
 	
-    <form action="/" method="post" class="form">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "user" %} Log in
-        </button>
-    {% endbuttons %}
-    </form>
+  <form action="/" method="post" class="form" style="width: 300px; margin: 50px auto 0px;">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% buttons %}
+          <button type="submit" class="btn btn-primary" id="id_submit">
+              {% bootstrap_icon "user" %} Sign in
+          </button>
+      {% endbuttons %}
+      {{ lol }}
+  </form>
         
-    <!--Import jQuery before materialize.js-->
-    {% block footer %}
-        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    {% endblock %}    
+  {% block footer %}
+  {% endblock %}
+
+  <script>
+      function toggled() {
+          if (document.getElementById('id_new_user').checked) {
+              var newstr = document.getElementById('id_submit').innerHTML;
+              newstr_n = newstr.replace("in", "up");
+              document.getElementById('id_submit').innerHTML = newstr_n;
+              document.getElementById('id_submit').className =
+                      document.getElementById('id_submit').className.replace("primary", "success");
+          } else {
+              var newstr = document.getElementById('id_submit').innerHTML;
+              newstr_n = newstr.replace("up", "in");
+              document.getElementById('id_submit').innerHTML = newstr_n;
+              document.getElementById('id_submit').className =
+                      document.getElementById('id_submit').className.replace("success", "primary");
+          }
+      }
+      toggled();
+  </script>
+
   </body>
 </html>

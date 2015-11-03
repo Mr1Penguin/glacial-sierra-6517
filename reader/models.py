@@ -16,3 +16,4 @@ class Site(models.Model):
 class Image(models.Model):
 	url = models.URLField()
 	site = models.ForeignKey(Site)
+	add_date = models.DateField()
