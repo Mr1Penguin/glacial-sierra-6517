@@ -2,9 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% load bootstrap3 %}
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
     <title></title>
+    <style>
+        .header {
+            height: 150px;
+        }
+        .userdata,
+        .logout {
+            text-align: right;
+        }
+        .userdata {
+            font-size: 20px;
+        }
+        .site {
+            display: inline-block;
+        }
+        .image {
+            border: solid 1px black;
+            margin: 5px 0px;
+        }
+        .image img {
+            display: block;
+            margin: auto;
+        }
+    </style>
 </head>
 <body>
-kek
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 header">
+            <div class="userdata">dummy@server.local</div>
+            <div class="logout"><button type="button" class="btn btn-danger">Log out</button></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="site">
+                <img src="http://deviantart.com/favicon.ico">
+                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+            </div>
+            <div class="site">
+                <img src="http://deviantart.com/favicon.ico">
+                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+            </div>
+            <div class="site">
+                <img src="http://deviantart.com/favicon.ico">
+                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+            </div>
+        </div>
+        <div class="col-sm-9 images">
+            <div class="image">
+                <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
+            </div>
+            <div class="image">
+                <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
