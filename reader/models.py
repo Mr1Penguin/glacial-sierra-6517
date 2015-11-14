@@ -10,10 +10,14 @@ class User(models.Model):
 
 class Site(models.Model):
 	url = models.URLField()
-	add_date = models.DateField()
+	add_date = models.DateTimeField()
 	user = models.ForeignKey(User)
 
 class Image(models.Model):
 	url = models.URLField()
 	site = models.ForeignKey(Site)
-	add_date = models.DateField()
+	add_date = models.DateTimeField()
+
+#check add date string if none exists
+class Collect(models.Model):
+        collect_date = models.DateTimeField()
