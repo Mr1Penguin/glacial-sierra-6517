@@ -44,11 +44,11 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-4 sites">
             {% for site in sites %}
                 <div class="site">
                     <img src="{{ site.icon_url }}"/>
-                    <a href="#" onclick="{# ajax #}">{{ site.title }}</a>
+                    <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
                 </div>
             {% endfor %}
             <div class="site">
@@ -74,7 +74,39 @@
             </div>
         </div>
         <script>
-            //ajax caller and callbacks
+            //ajax callers and callbacks
+            function loadSite(id) {
+                $.ajax({
+                    url: "load_site", //new view
+                    type: "GET",
+                    data: { "site_id": id },
+                    //fill div.images
+                    success: function(json) {
+                        console.log(json);
+                    },
+
+                    error: function(xhr, errmsg, err) {
+                        console.log("We have encountered an error: "+ errmsg);
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            }
+
+            function addSite() {
+                $.ajax({
+                    url: "add_site",
+                    type: "POST",
+                    //append div.sites
+                    success: function(json) {
+                        console.log(json);
+                    },
+
+                    error: function(xhr, errmsg, err) {
+                        console.log("We have encountered an error: "+ errmsg);
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                })
+            }
         </script>
     </div>
 </div>
