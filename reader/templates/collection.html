@@ -20,6 +20,9 @@
         .userdata {
             font-size: 20px;
         }
+        .sites {
+            margin-top: 5px;
+        }
         .site {
             display: inline-block;
         }
@@ -47,24 +50,33 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4 sites">
-            {% for site in sites %}
-                <div class="site">
-                    <img src="{{ site.icon_url }}"/>
-                    <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
+        <div class="col-sm-4">
+            <div id="addSiteForm" class="form-inline">
+                <div class="form-group">
+                    <label for="siteAddress">Address</label>
+                    <input id="siteAddress" class="form-control">
                 </div>
-            {% endfor %}
-            <div class="site">
-                <img src="http://deviantart.com/favicon.ico">
-                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+                <button onclick="addSite()" class="btn btn-default">Add</button>
             </div>
-            <div class="site">
-                <img src="http://deviantart.com/favicon.ico">
-                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
-            </div>
-            <div class="site">
-                <img src="http://deviantart.com/favicon.ico">
-                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+            <div class="sites">
+                {% for site in sites %}
+                    <div class="site">
+                        <img src="{{ site.icon_url }}"/>
+                        <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
+                    </div>
+                {% endfor %}
+                <div class="site">
+                    <img src="http://deviantart.com/favicon.ico">
+                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+                </div>
+                <div class="site">
+                    <img src="http://deviantart.com/favicon.ico">
+                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+                </div>
+                <div class="site">
+                    <img src="http://deviantart.com/favicon.ico">
+                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+                </div>
             </div>
         </div>
         <div class="col-sm-8 images">
