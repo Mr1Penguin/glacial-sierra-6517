@@ -16,7 +16,7 @@ def index(request):
                 curr.execute("insert into reader_user (user_email, password) values (%s, %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK')))
                 conn.commit()
             else:
-                content.update({"error": "User with this e-mail already exist!", "lastmail": request.POST.get('your_email')})
+                content.update({"error": "User with this e-mail already exist!", "lastmail": request.POST.get('your_email'), "checkbox" : True})
         else:
             # if correct load collection. else index with error
             curr.execute("select password from reader_user where user_email=(%s)", (request.POST.get('your_email'),))
