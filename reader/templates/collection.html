@@ -37,7 +37,7 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 header">
-            <div class="userdata">dummy@server.local</div>
+            <div class="userdata">{{ useremail }}</div>
             <form action="/">
                 <div class="logout"><input type="submit" class="btn btn-danger" value="Log out"/></div>
             </form>
@@ -45,6 +45,12 @@
     </div>
     <div class="row">
         <div class="col-sm-4">
+            {% for site in sites %}
+                <div class="site">
+                    <img src="{{ site.icon_url }}"/>
+                    <a href="#" onclick="{# ajax #}">{{ site.title }}</a>
+                </div>
+            {% endfor %}
             <div class="site">
                 <img src="http://deviantart.com/favicon.ico">
                 <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
@@ -59,6 +65,7 @@
             </div>
         </div>
         <div class="col-sm-8 images">
+            {# filled with js + jquery #}
             <div class="image">
                 <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
             </div>
@@ -66,6 +73,9 @@
                 <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
             </div>
         </div>
+        <script>
+            //ajax caller and callbacks
+        </script>
     </div>
 </div>
 </body>
