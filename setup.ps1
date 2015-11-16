@@ -1,0 +1,1 @@
+﻿$env:DATABASE_URL="postgres://mpreader:MPreader@localhost/mnreader"
