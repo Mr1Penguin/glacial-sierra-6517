@@ -10,7 +10,8 @@
     <title></title>
     <style>
         .header {
-            height: 150px;
+            height: 100px;
+            margin-top: 5px;
         }
         .userdata,
         .logout {
@@ -19,12 +20,15 @@
         .userdata {
             font-size: 20px;
         }
+        .sites {
+            margin-top: 5px;
+        }
         .site {
             display: inline-block;
         }
         .image {
             border: solid 1px black;
-            margin: 5px 0px;
+            margin: 5px 0;
         }
         .image img {
             display: block;
@@ -36,26 +40,47 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 header">
-            <div class="userdata">dummy@server.local</div>
-            <div class="logout"><button type="button" class="btn btn-danger">Log out</button></div>
+            <div class="userdata">{{ user.email }}</div>
+            <form action="/">
+                <div class="logout">
+                    <input id="user_id" type="hidden" value="{{ user.id }}"/>
+                    <input type="submit" class="btn btn-danger" value="Log out"/>
+                </div>
+            </form>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-3">
-            <div class="site">
-                <img src="http://deviantart.com/favicon.ico">
-                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+        <div class="col-sm-4">
+            <div id="addSiteForm" class="form-inline">
+                <div class="form-group">
+                    <label for="siteAddress">Address</label>
+                    <input id="siteAddress" class="form-control">
+                </div>
+                <button onclick="addSite()" class="btn btn-default">Add</button>
             </div>
-            <div class="site">
-                <img src="http://deviantart.com/favicon.ico">
-                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
-            </div>
-            <div class="site">
-                <img src="http://deviantart.com/favicon.ico">
-                <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+            <div class="sites">
+                {% for site in sites %}
+                    <div class="site">
+                        <img src="{{ site.icon_url }}"/>
+                        <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
+                    </div>
+                {% endfor %}
+                <div class="site">
+                    <img src="http://deviantart.com/favicon.ico">
+                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+                </div>
+                <div class="site">
+                    <img src="http://deviantart.com/favicon.ico">
+                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+                </div>
+                <div class="site">
+                    <img src="http://deviantart.com/favicon.ico">
+                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
+                </div>
             </div>
         </div>
-        <div class="col-sm-9 images">
+        <div class="col-sm-8 images">
+            {# filled with js + jquery #}
             <div class="image">
                 <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
             </div>
@@ -63,6 +88,42 @@
                 <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
             </div>
         </div>
+        <script>
+            //ajax callers and callbacks
+            function loadSite(id) {
+                $.ajax({
+                    url: "load_site", //new view
+                    type: "GET",
+                    data: { "site_id": id },
+                    //fill div.images
+                    success: function(json) {
+                        console.log(json);
+                    },
+
+                    error: function(xhr, errmsg, err) {
+                        console.log("We have encountered an error: "+ errmsg);
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            }
+
+            function addSite() {
+                $.ajax({
+                    url: "add_site",
+                    type: "POST",
+                    data: {"user_id" : $("#user_id").val()},
+                    //append div.sites
+                    success: function(json) {
+                        console.log(json);
+                    },
+
+                    error: function(xhr, errmsg, err) {
+                        console.log("We have encountered an error: "+ errmsg);
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                })
+            }
+        </script>
     </div>
 </div>
 </body>
