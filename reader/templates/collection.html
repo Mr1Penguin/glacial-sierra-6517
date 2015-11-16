@@ -37,9 +37,12 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 header">
-            <div class="userdata">{{ useremail }}</div>
+            <div class="userdata">{{ user.email }}</div>
             <form action="/">
-                <div class="logout"><input type="submit" class="btn btn-danger" value="Log out"/></div>
+                <div class="logout">
+                    <input id="user_id" type="hidden" value="{{ user.id }}"/>
+                    <input type="submit" class="btn btn-danger" value="Log out"/>
+                </div>
             </form>
         </div>
     </div>
@@ -96,6 +99,7 @@
                 $.ajax({
                     url: "add_site",
                     type: "POST",
+                    data: {"user_id" : $("#user_id").val()},
                     //append div.sites
                     success: function(json) {
                         console.log(json);
