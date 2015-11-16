@@ -8,3 +8,6 @@ class LoginForm(forms.Form):
         'password': forms.PasswordInput(),
     }
     new_user = forms.BooleanField(label="New user", widget=forms.CheckboxInput(attrs={'onclick': 'toggled();'}))
+    
+#class LogoutForm(forms.Form):
+#    user_id = forms.CharField(label="user_id")

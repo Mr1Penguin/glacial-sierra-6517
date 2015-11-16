@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.middleware.csrf import get_token
 from django.middleware.csrf import rotate_token
+from django.http import HttpResponseRedirect
 
 from .forms import LoginForm
 from .data_base import *
@@ -19,6 +20,7 @@ def index(request):
                 curr.execute("insert into reader_user (user_email, password, token) values (%s, %s, %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK'), get_token(request)))
                 conn.commit()
                 ren = render(request, 'collection.html')
+                ren = redirect('collection')
             else:
                 content.update({"error": "User with this e-mail already exist!", "lastmail": request.POST.get('your_email'), "checkbox" : True})
         else:
@@ -31,6 +33,7 @@ def index(request):
                     curr.execute("update reader_user set token=(%s) where user_email=(%s)", (get_token(request), request.POST.get('your_email', 'FUCK')))
                     conn.commit()
                     ren = render(request, 'collection.html')
+                    ren = redirect('collection')
                 else:
                     content.update({"error": "Wrong password!", "lastmail":request.POST.get('your_email')})
             else:
@@ -40,6 +43,23 @@ def index(request):
             curr.execute("select user_email from reader_user where token=(%s)", (get_token(request),))
             if curr.rowcount == 1:
                 ren = render(request, 'collection.html')
+                ren = redirect('collection')
     if ren is None:
         ren = render(request, 'index.html', content)
+    return ren
+
+def collection(request):
+    ren = None
+    if request.method == "GET":
+        #if request.GET.get('user_id', '') == 'None':
+            #print "shiii"
+            #rotate_token(request)
+            #ren = render(request, 'collection.html')
+        #else:
+            curr.execute("select user_email from reader_user where token=(%s)", (get_token(request),))
+            if curr.rowcount == 1:
+                ren = render(request, 'collection.html')
+    if ren is None:
+        #ren = HttpResponseRedirect('/', {"error": "ups"})
+        ren = redirect('index')
     return ren
