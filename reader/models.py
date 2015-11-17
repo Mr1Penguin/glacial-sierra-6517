@@ -9,7 +9,7 @@ class User(models.Model):
         return self.user_email
 
 class User_token(models.Model):
-    user_id = models.ForeignKey(User)
+    user = models.ForeignKey(User)
     token = models.CharField(max_length=255)
     last_use = models.DateTimeField()
 
@@ -23,6 +23,7 @@ class Image(models.Model):
     url = models.URLField()
     site = models.ForeignKey(Site)
     add_date = models.DateTimeField()
+    width = models.IntegerField(default=600)
 
 #check add date string if none exists
 class Collect(models.Model):
