@@ -28,7 +28,7 @@
             width: 100%;
         }
         .site-exists {
-            border: solid 1px red;
+            border-bottom: solid 1px red;
         }
         .image {
             border: solid 1px black;
@@ -126,10 +126,11 @@
                     },
                     //append div.sites
                     success: function(json) {
-                        if(json.code) {
+                        if(json.error) {
                             input.addClass("has-error");
-                            if(json.code == 9001) {
-                                $("#site-" + json.site_id).addClass("site-exists").delay(10000).removeClass("site-exists");
+                            if(json.error == 9001) {
+                                $("#site-" + json.site_id).addClass("site-exists");
+                                setTimeout(function() { $("#site-" + json.site_id).removeClass("site-exists"); }, 5000);
                                 return;
                             }
                             return;
@@ -146,7 +147,7 @@
                             "href" : "#",
                             "onclick" : "loadSite(" + json.site_id + ")"
                         });
-                        a.innerHTML(json.title);
+                        a.innerHTML = json.title;
                         div.addClass("site");
                         div.append(img, a);
                         $(".sites").append(div);
