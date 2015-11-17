@@ -64,7 +64,7 @@ def collection(request):
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
                 conn.commit()
                 curr.execute("""select user_token.token_id, user_email from reader_user right outer join 
-(                               select id as token_id, user_id from reader_user_token where token=(%s)) 
+                                (select id as token_id, user_id from reader_user_token where token=(%s)) 
                                 as user_token on reader_user.id = user_token.user_id""", (get_token(request),))
                 inform = curr.fetchone()
                 content = {"id" : inform[0], "email" : inform[1]}
