@@ -122,7 +122,6 @@ def add_site(request):
                         (select user_id from reader_user_token where token = (%s)))
                         returning id""", (url, get_token(request)))
         site_id = curr.fetchone()[0]
-        #print site_id
         parser = HTMLImgParser(curr, site_id)
         parser.feed(html)
         curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
