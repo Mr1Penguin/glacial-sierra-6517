@@ -53,12 +53,21 @@ def index(request):
 
 def collection(request):
     ren = None
-    if request.method == "GET":
+    if request.method == "POST":
+        token_id = request.POST.get('token_id', -1)
+        print token_id
+        print "loell"
+        if token_id != -1:
+            curr.execute("delete from reader_user_token where token=(%s)", (get_token(request),))
+            conn.commit()
+            rotate_token(request)
+            #ren = render(request, 'collection.html')
         #if request.GET.get('user_id', '') == 'None':
             #print "shiii"
             #rotate_token(request)
             #ren = render(request, 'collection.html')
-        #else:
+    else:
+        if request.method == "GET":
             curr.execute("select user_id from reader_user_token where token=(%s)", (get_token(request),))
             if curr.rowcount == 1:
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
