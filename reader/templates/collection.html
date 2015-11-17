@@ -40,7 +40,7 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 header">
-            <div class="userdata">{{ user.email }}</div>
+            <div class="userdata">{{ email }}</div>
             <form action="/collection/" method="post">
                 {% csrf_token %}
                 <div class="logout">
@@ -62,7 +62,7 @@
             <div class="sites">
                 {% for site in sites %}
                     <div class="site">
-                        <img src="{{ site.icon_url }}"/>
+                        {#<img sr="{{ site.icon_url }}"/>#}
                         <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
                     </div>
                 {% endfor %}
