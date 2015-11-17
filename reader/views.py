@@ -52,22 +52,23 @@ def index(request):
 def collection(request):
     ren = None
     if request.method == "POST":
-        token_id = request.POST.get('token_id', -1)
-        if token_id != -1:
-            curr.execute("delete from reader_user_token where token=(%s)", (get_token(request),))
-            conn.commit()
-            rotate_token(request)
+        curr.execute("delete from reader_user_token where token=(%s)", (get_token(request),))
+        conn.commit()
+        rotate_token(request)
     else:
         if request.method == "GET":
             curr.execute("select user_id from reader_user_token where token=(%s)", (get_token(request),))
             if curr.rowcount == 1:
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
                 conn.commit()
-                curr.execute("""select user_token.token_id, user_email from reader_user right outer join 
-                                (select id as token_id, user_id from reader_user_token where token=(%s)) 
-                                as user_token on reader_user.id = user_token.user_id""", (get_token(request),))
-                inform = curr.fetchone()
-                content = {"id" : inform[0], "email" : inform[1]}
+                #curr.execute("""select user_token.token_id, user_email from reader_user right outer join 
+                                #(select id as token_id, user_id from reader_user_token where token=(%s)) 
+                                #as user_token on reader_user.id = user_token.user_id""", (get_token(request),))
+                #inform = curr.fetchone()
+                #content = {"id" : inform[0], "email" : inform[1]}
+                curr.execute("""select user_email from reader_user where id = 
+                                (select user_id from reader_user_token where token=(%s))""", (get_token(request),))
+                content = {"email" : curr.fetchone()[0]}
                 curr.execute("select id, title from reader_site where user_id = (select user_id from reader_user_token where token=(%s))", (get_token(request),))
                 rows = curr.fetchall()
                 rowarray = []
