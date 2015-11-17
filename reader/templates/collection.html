@@ -43,7 +43,7 @@
             <div class="userdata">{{ user.email }}</div>
             <form action="/collection">
                 <div class="logout">
-                    <input id="user_id" type="hidden" value="{{ user.id }}"/>
+                    <input id="token_id" type="hidden" value="{{ id }}"/>
                     <input type="submit" class="btn btn-danger" value="Log out"/>
                 </div>
             </form>
