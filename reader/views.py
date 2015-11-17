@@ -87,7 +87,6 @@ def load_site(request):
     if request.method == "GET":
         curr.execute("select url, width from reader_image where site_id=(%s)", (request.GET.get('site_id')))
         rows = curr.fetchall()
-        print rows
         sites = []
         for row in rows:
             t = collections.OrderedDict()
@@ -96,3 +95,6 @@ def load_site(request):
             sites.append(t)
         sites_j = json.dumps(sites)
         return HttpResponse(sites_j, content_type="application/json")
+
+def add_site(request):
+    return HttpResponse("lol")

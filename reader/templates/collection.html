@@ -44,7 +44,6 @@
             <form action="/collection/" method="post">
                 {% csrf_token %}
                 <div class="logout">
-                    <input name="token_id" type="hidden" value="{{ id }}"/>
                     <input type="submit" class="btn btn-danger" value="Log out"/>
                 </div>
             </form>
@@ -71,6 +70,12 @@
         <div class="col-sm-8 images">
         </div>
         <script>
+            function getCookie(name) {
+                var matches = document.cookie.match(new RegExp(
+                        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+                ));
+                return matches ? decodeURIComponent(matches[1]) : undefined;
+            }
             //ajax callers and callbacks
             function loadSite(id) {
                 $.ajax({
@@ -100,9 +105,12 @@
 
             function addSite() {
                 $.ajax({
-                    url: "add_site",
+                    url: "add_site/",
                     type: "POST",
-                    data: {"user_id" : $("#user_id").val()},
+                    headers: {"X-CSRFToken": getCookie("csrftoken")},
+                    data: {
+                        "url" : $("#site_address").val()
+                    },
                     //append div.sites
                     success: function(json) {
                         
