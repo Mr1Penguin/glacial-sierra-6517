@@ -66,13 +66,15 @@ def collection(request):
                 curr.execute("""select user_email from reader_user where id = 
                                 (select user_id from reader_user_token where token=(%s))""", (get_token(request),))
                 content = {"email" : curr.fetchone()[0]}
-                curr.execute("select id, title from reader_site where user_id = (select user_id from reader_user_token where token=(%s))", (get_token(request),))
+                curr.execute("select id, title, url from reader_site where user_id = (select user_id from reader_user_token where token=(%s))", (get_token(request),))
                 rows = curr.fetchall()
                 rowarray = []
                 for row in rows:
                     d = collections.OrderedDict()
                     d['id'] = row[0]
                     d['title'] = row[1]
+                    dd = row[2].split('/')
+                    d['favicon'] = ('http://' + dd[0] if dd[0] != 'http:' else dd[0] + '//' +  dd[2]) + '/favicon.ico'
                     rowarray.append(d)
                 content.update({"sites" : rowarray})
                 ren = render(request, 'collection.html', content)
