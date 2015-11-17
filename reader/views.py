@@ -1,5 +1,7 @@
 import json
 import collections
+#import urllib
+import urllib2
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -84,7 +86,6 @@ def collection(request):
     return ren
 
 def load_site(request):
-    ren = None
     if request.method == "GET":
         curr.execute("select url, width from reader_image where site_id=(%s)", (request.GET.get('site_id')))
         rows = curr.fetchall()
@@ -98,4 +99,14 @@ def load_site(request):
         return HttpResponse(sites_j, content_type="application/json")
 
 def add_site(request):
-    return HttpResponse("lol")
+    if request.method == "POST":
+        url = request.POST.get('url')
+        try: response = urllib2.urlopen(url)
+        except urllib2.HTTPError as e:
+            return HttpResponse(e.code)
+        html = response.read()
+        curr.execute("""insert into reader_site (url, add_date, user_id) 
+                        values ((%s), (select clock_timestamp()), 
+                        (select user_id from reader_user_token where token = (%s)))""", (url, get_token(request)))
+        conn.commit()
+    return HttpResponse("SUCCESS")
