@@ -66,7 +66,7 @@ def collection(request):
                 curr.execute("""select user_email from reader_user where id = 
                                 (select user_id from reader_user_token where token=(%s))""", (get_token(request),))
                 content = {"email" : curr.fetchone()[0]}
-                curr.execute("select id, title, url from reader_site where user_id = (select user_id from reader_user_token where token=(%s))", (get_token(request),))
+                curr.execute("select id, title, url from reader_site where user_id = (select user_id from reader_user_token where token=(%s)) order by id", (get_token(request),))
                 rows = curr.fetchall()
                 rowarray = []
                 for row in rows:

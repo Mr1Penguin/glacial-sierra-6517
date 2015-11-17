@@ -149,7 +149,8 @@
                         });
                         a.innerHTML = json.title;
                         div.addClass("site");
-                        div.append(img, a);
+                        div.append(img);
+                        div.append(a);
                         $(".sites").append(div);
                         input.val('');
                     },
