@@ -109,7 +109,7 @@
                     type: "POST",
                     headers: {"X-CSRFToken": getCookie("csrftoken")},
                     data: {
-                        "url" : $("#site_address").val()
+                        "url" : $("#siteAddress").val()
                     },
                     //append div.sites
                     success: function(json) {
