@@ -1,6 +1,5 @@
 import json
 import collections
-#import urllib
 import urllib2
 
 from django.http import HttpResponse
@@ -8,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.middleware.csrf import get_token, rotate_token
 
 from .forms import LoginForm
+from .parser import *
 from .data_base import *
 
 # Create your views here.
@@ -63,11 +63,6 @@ def collection(request):
             if curr.rowcount == 1:
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
                 conn.commit()
-                #curr.execute("""select user_token.token_id, user_email from reader_user right outer join 
-                                #(select id as token_id, user_id from reader_user_token where token=(%s)) 
-                                #as user_token on reader_user.id = user_token.user_id""", (get_token(request),))
-                #inform = curr.fetchone()
-                #content = {"id" : inform[0], "email" : inform[1]}
                 curr.execute("""select user_email from reader_user where id = 
                                 (select user_id from reader_user_token where token=(%s))""", (get_token(request),))
                 content = {"email" : curr.fetchone()[0]}
@@ -87,7 +82,7 @@ def collection(request):
 
 def load_site(request):
     if request.method == "GET":
-        curr.execute("select url, width from reader_image where site_id=(%s)", (request.GET.get('site_id')))
+        curr.execute("select url, width from reader_image where site_id=(%s)", (request.GET.get('site_id'),))
         rows = curr.fetchall()
         sites = []
         for row in rows:
@@ -100,13 +95,35 @@ def load_site(request):
 
 def add_site(request):
     if request.method == "POST":
+        def create_json(toSend, isError):
+            content = collections.OrderedDict()
+            if isError:
+                content['error'] = toSend[0]
+                if toSend[0] >= 1000:
+                    content['site_id'] = toSend[1]
+            else:
+                content['site_id'] = toSend[0]
+                content['title'] = toSend[1]
+            return json.dumps(content)
         url = request.POST.get('url')
+        curr.execute("""select id from reader_site where url = (%s)""", (url,))
+        if curr.rowcount != 0:
+            return HttpResponse(create_json([9001, curr.fetchone()[0]], True))
         try: response = urllib2.urlopen(url)
         except urllib2.HTTPError as e:
-            return HttpResponse(e.code)
+            return HttpResponse(create_json([e.code], True))
+        except Exception as e:
+            return HttpResponse(create_json([404], True))
         html = response.read()
         curr.execute("""insert into reader_site (url, add_date, user_id) 
                         values ((%s), (select clock_timestamp()), 
-                        (select user_id from reader_user_token where token = (%s)))""", (url, get_token(request)))
+                        (select user_id from reader_user_token where token = (%s)))
+                        returning id""", (url, get_token(request)))
+        site_id = curr.fetchone()[0]
+        #print site_id
+        parser = HTMLImgParser(curr, site_id)
+        parser.feed(html)
+        curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
         conn.commit()
-    return HttpResponse("SUCCESS")
+        return HttpResponse(create_json([site_id, curr.fetchone()[0]], False))
+    return HttpResponse("Not available")
