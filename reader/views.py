@@ -110,12 +110,12 @@ def add_site(request):
         url = request.POST.get('url')
         curr.execute("""select id from reader_site where url = (%s)""", (url,))
         if curr.rowcount != 0:
-            return HttpResponse(create_json([9001, curr.fetchone()[0]], True))
+            return HttpResponse(create_json([9001, curr.fetchone()[0]], True), content_type="application/json")
         try: response = urllib2.urlopen(url)
         except urllib2.HTTPError as e:
-            return HttpResponse(create_json([e.code], True))
+            return HttpResponse(create_json([e.code], True), content_type="application/json")
         except Exception as e:
-            return HttpResponse(create_json([404], True))
+            return HttpResponse(create_json([404], True), content_type="application/json")
         html = response.read()
         curr.execute("""insert into reader_site (url, add_date, user_id) 
                         values ((%s), (select clock_timestamp()), 
@@ -127,5 +127,5 @@ def add_site(request):
         parser.feed(html)
         curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
         conn.commit()
-        return HttpResponse(create_json([site_id, curr.fetchone()[0]], False))
+        return HttpResponse(create_json([site_id, curr.fetchone()[0]], False), content_type="application/json")
     return HttpResponse("Not available")
