@@ -14,13 +14,13 @@ class User_token(models.Model):
     last_use = models.DateTimeField()
 
 class Site(models.Model):
-    url = models.URLField()
+    url = models.URLField(max_length=2000)
     add_date = models.DateTimeField()
     user = models.ForeignKey(User)
     title = models.CharField(max_length=255, null=True)
 
 class Image(models.Model):
-    url = models.URLField()
+    url = models.URLField(max_length=2000)
     site = models.ForeignKey(Site)
     add_date = models.DateTimeField()
     width = models.IntegerField(default=600)
