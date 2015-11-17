@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
-from django.middleware.csrf import get_token
-from django.middleware.csrf import rotate_token
-from django.http import HttpResponseRedirect
+from django.middleware.csrf import get_token, rotate_token
 
 from .forms import LoginForm
 from .data_base import *
@@ -19,7 +17,7 @@ def index(request):
                 rotate_token(request)
                 #curr.execute("insert into reader_user (user_email, password, token) values (%s, %s, %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK'), get_token(request)))
                 curr.execute("insert into reader_user (user_email, password) values (%s, %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK')))
-                curr.execute("insert into reader_user_token (user_id_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
+                curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
                 conn.commit()
                 #ren = render(request, 'collection.html')
                 ren = redirect('collection')
@@ -33,7 +31,7 @@ def index(request):
                 if passwd == request.POST.get('password'):
                     rotate_token(request)
                     #curr.execute("update reader_user set token=(%s) where user_email=(%s)", (get_token(request), request.POST.get('your_email', 'FUCK')))
-                    curr.execute("insert into reader_user_token (user_id_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
+                    curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
                     conn.commit()
                     #ren = render(request, 'collection.html')
                     ren = redirect('collection')
@@ -43,7 +41,7 @@ def index(request):
                 content.update({"error": "User with this e-mail doesn't exist!", "lastmail":request.POST.get('your_email')})
     else:
         if request.method == "GET":
-            curr.execute("select user_id_id from reader_user_token where token=(%s)", (get_token(request),))
+            curr.execute("select user_id from reader_user_token where token=(%s)", (get_token(request),))
             if curr.rowcount == 1:
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
                 conn.commit()
@@ -61,11 +59,12 @@ def collection(request):
             #rotate_token(request)
             #ren = render(request, 'collection.html')
         #else:
-            curr.execute("select user_id_id from reader_user_token where token=(%s)", (get_token(request),))
+            curr.execute("select user_id from reader_user_token where token=(%s)", (get_token(request),))
             if curr.rowcount == 1:
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
                 conn.commit()
-                ren = render(request, 'collection.html')
+                curr.execute("select id from reader_user_token where token=(%s)", (get_token(request),))
+                ren = render(request, 'collection.html', {id : curr.fetchone()[0]})
     if ren is None:
         #ren = HttpResponseRedirect('/', {"error": "ups"})
         ren = redirect('index')
