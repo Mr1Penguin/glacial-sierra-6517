@@ -25,6 +25,7 @@
         }
         .site {
             display: inline-block;
+            width: 100%;
         }
         .image {
             border: solid 1px black;
@@ -51,17 +52,18 @@
     </div>
     <div class="row">
         <div class="col-sm-4">
-            <div id="addSiteForm" class="form-inline">
-                <div class="form-group">
-                    <label for="siteAddress">Address</label>
-                    <input id="siteAddress" class="form-control">
+            <div id="addSiteForm">
+                <div class="input-group">
+                    <input id="siteAddress" class="form-control" placeholder="Address">
+                    <span class="input-group-btn">
+                        <button onclick="addSite()" class="btn btn-default">Add</button>
+                    </span>
                 </div>
-                <button onclick="addSite()" class="btn btn-default">Add</button>
             </div>
             <div class="sites">
                 {% for site in sites %}
                     <div class="site">
-                        {#<img sr="{{ site.icon_url }}"/>#}
+                        <img src="{{ site.favicon }}"  height=16/>
                         <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
                     </div>
                 {% endfor %}
