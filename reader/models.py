@@ -5,14 +5,19 @@ from django.db import models
 class User(models.Model):
     user_email = models.EmailField()
     password = models.CharField(max_length=255)
-    token = models.CharField(max_length=255, null=True)
     def __unicode__ (self):
         return self.user_email
+
+class User_token(models.Model):
+    user_id = models.ForeignKey(User)
+    token = models.CharField(max_length=255)
+    last_use = models.DateTimeField()
 
 class Site(models.Model):
     url = models.URLField()
     add_date = models.DateTimeField()
     user = models.ForeignKey(User)
+    title = models.CharField(max_length=255, null=True)
 
 class Image(models.Model):
     url = models.URLField()
