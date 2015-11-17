@@ -146,7 +146,7 @@
                             "href" : "#",
                             "onclick" : "loadSite(" + json.site_id + ")"
                         });
-                        a.innerHTML(json.title);
+                        a.innerHTML = json.title;
                         div.addClass("site");
                         div.append(img, a);
                         $(".sites").append(div);
