@@ -66,28 +66,9 @@
                         <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
                     </div>
                 {% endfor %}
-                <div class="site">
-                    <img src="http://deviantart.com/favicon.ico">
-                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
-                </div>
-                <div class="site">
-                    <img src="http://deviantart.com/favicon.ico">
-                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
-                </div>
-                <div class="site">
-                    <img src="http://deviantart.com/favicon.ico">
-                    <a href="http://ncmares.deviantart.com/gallery/">http://ncmares.deviantart.com/gallery/</a>
-                </div>
             </div>
         </div>
         <div class="col-sm-8 images">
-            {# filled with js + jquery #}
-            <div class="image">
-                <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
-            </div>
-            <div class="image">
-                <img src="http://pre06.deviantart.net/e8b0/th/pre/f/2015/304/c/3/when_the_40k_squad_on_point_by_ncmares-d9f2frm.jpg" alt="" width="600">
-            </div>
         </div>
         <script>
             //ajax callers and callbacks
@@ -98,7 +79,16 @@
                     data: { "site_id": id },
                     //fill div.images
                     success: function(json) {
-                        console.log(json);
+                        $(".images").html("");
+                        $.each(json, function(arrayID, image) {
+                            var div = $("<div></div>").addClass("image");
+                            var img = $("<img>").attr({
+                                "src": image.url,
+                                "width": image.width > 600 ? 600 : image.width
+                            });
+                            div.append(img);
+                            $(".images").append(div);
+                        });
                     },
 
                     error: function(xhr, errmsg, err) {
@@ -115,7 +105,7 @@
                     data: {"user_id" : $("#user_id").val()},
                     //append div.sites
                     success: function(json) {
-                        console.log(json);
+                        
                     },
 
                     error: function(xhr, errmsg, err) {

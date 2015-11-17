@@ -1,5 +1,7 @@
 import json
 import collections
+
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.middleware.csrf import get_token, rotate_token
 
@@ -79,3 +81,18 @@ def collection(request):
     if ren is None:
         ren = redirect('index')
     return ren
+
+def load_site(request):
+    ren = None
+    if request.method == "GET":
+        curr.execute("select url, width from reader_image where site_id=(%s)", (request.GET.get('site_id')))
+        rows = curr.fetchall()
+        print rows
+        sites = []
+        for row in rows:
+            t = collections.OrderedDict()
+            t['url'] = row[0]
+            t['width'] = row[1]
+            sites.append(t)
+        sites_j = json.dumps(sites)
+        return HttpResponse(sites_j, content_type="application/json")
