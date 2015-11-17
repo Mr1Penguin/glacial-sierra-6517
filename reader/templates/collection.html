@@ -27,6 +27,9 @@
             display: inline-block;
             width: 100%;
         }
+        .site-exists {
+            border: solid 1px red;
+        }
         .image {
             border: solid 1px black;
             margin: 5px 0;
@@ -62,7 +65,7 @@
             </div>
             <div class="sites">
                 {% for site in sites %}
-                    <div class="site">
+                    <div id="site-{{ site.id }}" class="site">
                         <img src="{{ site.favicon }}"  height=16/>
                         <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
                     </div>
@@ -106,16 +109,48 @@
             }
 
             function addSite() {
+                var input = $("#siteAddress");
+                input.removeClass("has-error");
+                $(".site").removeClass("site-exists");
+                if (input.val() == '') {
+                    input.addClass("has-error");
+                    return;
+                }
+                var url = (/^http:\/\//.test(input.val()) ? '' : 'http://') + input.val();
                 $.ajax({
                     url: "add_site/",
                     type: "POST",
                     headers: {"X-CSRFToken": getCookie("csrftoken")},
                     data: {
-                        "url" : $("#siteAddress").val()
+                        "url" : url
                     },
                     //append div.sites
                     success: function(json) {
-                        
+                        if(json.code) {
+                            input.addClass("has-error");
+                            if(json.code == 9001) {
+                                $("#site-" + json.site_id).addClass("site-exists").delay(10000).removeClass("site-exists");
+                                return;
+                            }
+                            return;
+                        }
+                        var div = $("<div></div>");
+                        var img = $("<img>");
+                        var a = $("<a></a>");
+                        var split = url.split('/');
+                        img.attr({
+                            "height" : 16,
+                            "src" : split[0] + '//' + split[2] + '/favicon.ico'
+                        });
+                        a.attr({
+                            "href" : "#",
+                            "onclick" : "loadSite(" + json.site_id + ")"
+                        });
+                        a.innerHTML(json.title);
+                        div.addClass("site");
+                        div.append(img, a);
+                        $(".sites").append(div);
+                        input.val('');
                     },
 
                     error: function(xhr, errmsg, err) {
