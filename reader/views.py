@@ -1,3 +1,5 @@
+import json
+import collections
 from django.shortcuts import render, redirect
 from django.middleware.csrf import get_token, rotate_token
 
@@ -9,17 +11,14 @@ def index(request):
     form = LoginForm()
     ren = None
     content = {"form" : form}
-    #ren = render(request, 'index.html', {"form": form, "lolel": "error_text"})
     if request.method == "POST":
         if request.POST.get('new_user'):
             curr.execute("select user_email from reader_user where user_email=(%s)", (request.POST.get('your_email'),))
             if curr.rowcount == 0:
                 rotate_token(request)
-                #curr.execute("insert into reader_user (user_email, password, token) values (%s, %s, %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK'), get_token(request)))
                 curr.execute("insert into reader_user (user_email, password) values (%s, %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK')))
                 curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
                 conn.commit()
-                #ren = render(request, 'collection.html')
                 ren = redirect('collection')
             else:
                 content.update({"error": "User with this e-mail already exist!", "lastmail": request.POST.get('your_email'), "checkbox" : True})
@@ -30,10 +29,8 @@ def index(request):
                 passwd = curr.fetchone()[0]
                 if passwd == request.POST.get('password'):
                     rotate_token(request)
-                    #curr.execute("update reader_user set token=(%s) where user_email=(%s)", (get_token(request), request.POST.get('your_email', 'FUCK')))
                     curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
                     conn.commit()
-                    #ren = render(request, 'collection.html')
                     ren = redirect('collection')
                 else:
                     content.update({"error": "Wrong password!", "lastmail":request.POST.get('your_email')})
@@ -45,7 +42,6 @@ def index(request):
             if curr.rowcount == 1:
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
                 conn.commit()
-                #ren = render(request, 'collection.html')
                 ren = redirect('collection')
     if ren is None:
         ren = render(request, 'index.html', content)
@@ -53,19 +49,33 @@ def index(request):
 
 def collection(request):
     ren = None
-    if request.method == "GET":
-        #if request.GET.get('user_id', '') == 'None':
-            #print "shiii"
-            #rotate_token(request)
-            #ren = render(request, 'collection.html')
-        #else:
+    if request.method == "POST":
+        token_id = request.POST.get('token_id', -1)
+        if token_id != -1:
+            curr.execute("delete from reader_user_token where token=(%s)", (get_token(request),))
+            conn.commit()
+            rotate_token(request)
+    else:
+        if request.method == "GET":
             curr.execute("select user_id from reader_user_token where token=(%s)", (get_token(request),))
             if curr.rowcount == 1:
                 curr.execute("update reader_user_token set last_use=(select clock_timestamp()) where token=(%s)", (get_token(request),))
                 conn.commit()
-                curr.execute("select id from reader_user_token where token=(%s)", (get_token(request),))
-                ren = render(request, 'collection.html', {id : curr.fetchone()[0]})
+                curr.execute("""select user_token.token_id, user_email from reader_user right outer join 
+(                               select id as token_id, user_id from reader_user_token where token=(%s)) 
+                                as user_token on reader_user.id = user_token.user_id""", (get_token(request),))
+                inform = curr.fetchone()
+                content = {"id" : inform[0], "email" : inform[1]}
+                curr.execute("select id, title from reader_site where user_id = (select user_id from reader_user_token where token=(%s))", (get_token(request),))
+                rows = curr.fetchall()
+                rowarray = []
+                for row in rows:
+                    d = collections.OrderedDict()
+                    d['id'] = row[0]
+                    d['title'] = row[1]
+                    rowarray.append(d)
+                content.update({"sites" : rowarray})
+                ren = render(request, 'collection.html', content)
     if ren is None:
-        #ren = HttpResponseRedirect('/', {"error": "ups"})
         ren = redirect('index')
     return ren
