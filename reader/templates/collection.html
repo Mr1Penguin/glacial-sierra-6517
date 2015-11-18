@@ -186,7 +186,7 @@
                     data: { "site_id" : id },
                     success: function(json) {
                         if(json.ok) {
-
+                            $("#site-" + id).remove();
                         }
                     },
                     error: function(xhr, errmsg, err) {
