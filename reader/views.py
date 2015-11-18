@@ -137,5 +137,5 @@ def add_site(request):
         return HttpResponse(create_json([site_id, curr.fetchone()[0]], False), content_type="application/json")
     return HttpResponse("Not available")
 
-def add_site(request):
+def delete_site(request):
     return None
