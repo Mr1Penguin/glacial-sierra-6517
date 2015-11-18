@@ -66,7 +66,7 @@ def collection(request):
                 curr.execute("""select user_email from reader_user where id = 
                                 (select user_id from reader_user_token where token=(%s))""", (get_token(request),))
                 content = {"email" : curr.fetchone()[0]}
-                curr.execute("select id, title, url from reader_site where user_id = (select user_id from reader_user_token where token=(%s)) order by id", (get_token(request),))
+                curr.execute("select id, title, url, favicon from reader_site where user_id = (select user_id from reader_user_token where token=(%s)) order by id", (get_token(request),))
                 rows = curr.fetchall()
                 rowarray = []
                 for row in rows:
@@ -74,7 +74,7 @@ def collection(request):
                     d['id'] = row[0]
                     d['title'] = row[1]
                     dd = row[2].split('/')
-                    d['favicon'] = ('http://' + dd[0] if dd[0] != 'http:' else dd[0] + '//' +  dd[2]) + '/favicon.ico'
+                    d['favicon'] = row[3] or (('http://' + dd[0] if dd[0] != 'http:' else dd[0] + '//' +  dd[2]) + '/favicon.ico')
                     rowarray.append(d)
                 content.update({"sites" : rowarray})
                 ren = render(request, 'collection.html', content)
@@ -106,6 +106,9 @@ def add_site(request):
             else:
                 content['site_id'] = toSend[0]
                 content['title'] = toSend[1]
+                curr.execute("""select favicon from reader_site where id = (%s)""", [site_id])
+                if curr.rowcount != 0:
+                    content['custom_favicon'] = curr.fetchone()[0]
             return json.dumps(content)
         url = request.POST.get('url')
         curr.execute("""select id from reader_site where url = (%s)
