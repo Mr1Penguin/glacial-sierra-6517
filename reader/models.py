@@ -15,6 +15,7 @@ class User_token(models.Model):
 
 class Site(models.Model):
     url = models.URLField(max_length=2000)
+    favicon = models.URLField(max_length=2000, null=True)
     add_date = models.DateTimeField()
     user = models.ForeignKey(User)
     title = models.CharField(max_length=255, null=True)
