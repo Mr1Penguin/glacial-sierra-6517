@@ -180,7 +180,7 @@
 
             function deleteSite(id) {
                 $.ajax({
-                    url: "add_site/",
+                    url: "delete_site/",
                     type: "POST",
                     headers: {"X-CSRFToken": getCookie("csrftoken")},
                     data: { "site_id" : id },
