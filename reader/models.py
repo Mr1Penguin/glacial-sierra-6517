@@ -21,7 +21,7 @@ class Site(models.Model):
     title = models.CharField(max_length=255, null=True)
 
 class Image(models.Model):
-    url = models.URLField(max_length=2000)
+    url = models.TextField()
     site = models.ForeignKey(Site)
     add_date = models.DateTimeField()
     width = models.IntegerField(default=600)
