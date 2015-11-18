@@ -1,4 +1,3 @@
-from __future__ import unicode_literals 
 from HTMLParser import HTMLParser
 
 class HTMLImgParser(HTMLParser):

@@ -109,7 +109,7 @@ def add_site(request):
             return json.dumps(content)
         url = request.POST.get('url')
         curr.execute("""select id from reader_site where url = (%s)
-        and user_id = (select user_id from reader_user_token where token = (%s))""", (url, get_token(request)))
+                        and user_id = (select user_id from reader_user_token where token = (%s))""", (url, get_token(request)))
         if curr.rowcount != 0:
             return HttpResponse(create_json([9001, curr.fetchone()[0]], True), content_type="application/json")
         try: response = urllib2.urlopen(url)
@@ -137,5 +137,12 @@ def add_site(request):
         return HttpResponse(create_json([site_id, curr.fetchone()[0]], False), content_type="application/json")
     return HttpResponse("Not available")
 
-def add_site(request):
-    return None
+def delete_site(request):
+    site_id = request.POST.get('site_id')
+    curr.execute("""delete from reader_image where site_id = (%s)""", [site_id])
+    curr.execute("""delete from reader_site where id = (%s) and user_id = (
+                    select user_id from reader_user_token where token = (%s))""", [site_id, get_token(request)])
+    conn.commit()
+    content = collections.OrderedDict()
+    content['ok'] = True
+    return HttpResponse(json.dumps(content), content_type="application/json")
