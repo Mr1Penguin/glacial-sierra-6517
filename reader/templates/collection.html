@@ -183,7 +183,7 @@
                     url: "add_site/",
                     type: "POST",
                     headers: {"X-CSRFToken": getCookie("csrftoken")},
-                    data: {},
+                    data: { "site_id" : id },
                     success: function(json) {
                         if(json.ok) {
 
