@@ -38,6 +38,13 @@
             display: block;
             margin: auto;
         }
+        .remove {
+            display: none;
+            cursor: pointer;
+        }
+        .site:hover .remove {
+            display: inline;
+        }
     </style>
 </head>
 <body>
@@ -68,6 +75,10 @@
                     <div id="site-{{ site.id }}" class="site">
                         <img src="{{ site.favicon }}"  height=16/>
                         <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
+                        <svg height="10" width="10" class="remove" onclick="deleteSite({{ site.id }})">
+                            <line x1="0" y1="0" x2="10" y2="10" style="stroke:rgb(0,0,0);stroke-width:2" />
+                            <line x1="0" y1="10" x2="10" y2="0" style="stroke:rgb(0,0,0);stroke-width:2" />
+                        </svg>
                     </div>
                 {% endfor %}
             </div>
@@ -141,16 +152,21 @@
                         var split = url.split('/');
                         img.attr({
                             "height" : 16,
-                            "src" : split[0] + '//' + split[2] + '/favicon.ico'
+                            "src" : json.favicon ? json.favicon : split[0] + '//' + split[2] + '/favicon.ico'
                         });
                         a.attr({
                             "href" : "#",
                             "onclick" : "loadSite(" + json.site_id + ")"
                         });
-                        a.innerHTML = json.title;
+                        a.text(json.title);
+                        var svg = "<svg width='10' height='10' class='remove' onclick='deleteSite(" + json.site_id + ")'><line x1='0' x2='10' y1='0' y2='10' style='stroke:rgb(0,0,0);stroke-width:2'/><line x1='0' x2='10' y1='10' y2='0' style='stroke:rgb(0,0,0);stroke-width:2'/></svg>"
                         div.addClass("site");
+                        div.attr("id", "site-" + json.site_id);
                         div.append(img);
+                        div.append(" ");
                         div.append(a);
+                        div.append(" ");
+                        div.append(svg);
                         $(".sites").append(div);
                         input.val('');
                     },
@@ -159,7 +175,25 @@
                         console.log("We have encountered an error: "+ errmsg);
                         console.log(xhr.status + ": " + xhr.responseText);
                     }
-                })
+                });
+            }
+
+            function deleteSite(id) {
+                $.ajax({
+                    url: "add_site/",
+                    type: "POST",
+                    headers: {"X-CSRFToken": getCookie("csrftoken")},
+                    data: {},
+                    success: function(json) {
+                        if(json.ok) {
+
+                        }
+                    },
+                    error: function(xhr, errmsg, err) {
+                        console.log("We have encountered an error: "+ errmsg);
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
             }
         </script>
     </div>
