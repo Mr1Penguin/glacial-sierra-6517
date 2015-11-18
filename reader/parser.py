@@ -1,3 +1,4 @@
+from __future__ import unicode_literals 
 from HTMLParser import HTMLParser
 
 class HTMLImgParser(HTMLParser):
@@ -9,6 +10,7 @@ class HTMLImgParser(HTMLParser):
         self.site_id = siteid
         HTMLParser.__init__(self)
     def handle_starttag(self, tag, attrs):
+        #print tag
         if tag == "title":
             self.isTitle = True
         if tag == "img":
@@ -19,7 +21,6 @@ class HTMLImgParser(HTMLParser):
     def handle_data(self, data):
         if self.isTitle:
             self.isTitle = False
-            #print ":".join("{:02x}".format(ord(c)) for c in data)
-            data = data.decode('cp1251').encode('utf8')
             self.curr.execute("""update reader_site set title = (%s) where id = (%s)""", (data, self.site_id))
+
             

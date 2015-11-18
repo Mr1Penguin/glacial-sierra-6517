@@ -108,7 +108,8 @@ def add_site(request):
                 content['title'] = toSend[1]
             return json.dumps(content)
         url = request.POST.get('url')
-        curr.execute("""select id from reader_site where url = (%s)""", (url,))
+        curr.execute("""select id from reader_site where url = (%s)
+        and user_id = (select user_id from reader_user_token where token = (%s))""", (url, get_token(request)))
         if curr.rowcount != 0:
             return HttpResponse(create_json([9001, curr.fetchone()[0]], True), content_type="application/json")
         try: response = urllib2.urlopen(url)
@@ -117,13 +118,20 @@ def add_site(request):
         except Exception as e:
             return HttpResponse(create_json([404], True), content_type="application/json")
         html = response.read()
+        if not isinstance(html, unicode):
+            try: 
+                unihtml = unicode(html, 'utf-8')
+            except UnicodeError:
+                unihtml = html.decode('cp1251').encode('utf8')
+        else:
+            unihtml = html
         curr.execute("""insert into reader_site (url, add_date, user_id) 
                         values ((%s), (select clock_timestamp()), 
                         (select user_id from reader_user_token where token = (%s)))
                         returning id""", (url, get_token(request)))
         site_id = curr.fetchone()[0]
         parser = HTMLImgParser(curr, site_id)
-        parser.feed(html)
+        parser.feed(unihtml)
         curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
         conn.commit()
         return HttpResponse(create_json([site_id, curr.fetchone()[0]], False), content_type="application/json")
