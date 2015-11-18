@@ -115,11 +115,15 @@ def add_site(request):
                         and user_id = (select user_id from reader_user_token where token = (%s))""", (url, get_token(request)))
         if curr.rowcount != 0:
             return HttpResponse(create_json([9001, curr.fetchone()[0]], True), content_type="application/json")
-        try: response = urllib2.urlopen(url)
+        try:
+            #req = urllib2.Request(url)
+            #response = urllib2.urlopen(req)
+            response = urllib2.urlopen(url)
         except urllib2.HTTPError as e:
             return HttpResponse(create_json([e.code], True), content_type="application/json")
         except Exception as e:
-            return HttpResponse(create_json([404], True), content_type="application/json")
+            #print e.reason
+            return HttpResponse(create_json([901], True), content_type="application/json")
         html = response.read()
         if not isinstance(html, unicode):
             try: 
@@ -141,11 +145,13 @@ def add_site(request):
     return HttpResponse("Not available")
 
 def delete_site(request):
-    site_id = request.POST.get('site_id')
-    curr.execute("""delete from reader_image where site_id = (%s)""", [site_id])
-    curr.execute("""delete from reader_site where id = (%s) and user_id = (
-                    select user_id from reader_user_token where token = (%s))""", [site_id, get_token(request)])
-    conn.commit()
-    content = collections.OrderedDict()
-    content['ok'] = True
-    return HttpResponse(json.dumps(content), content_type="application/json")
+    if request.method == "POST":
+        site_id = request.POST.get('site_id', 0)
+        curr.execute("""delete from reader_image where site_id = (%s)""", [site_id])
+        curr.execute("""delete from reader_site where id = (%s) and user_id = (
+                        select user_id from reader_user_token where token = (%s))""", [site_id, get_token(request)])
+        conn.commit()
+        content = collections.OrderedDict()
+        content['ok'] = True
+        return HttpResponse(json.dumps(content), content_type="application/json")
+    return HttpResponse("Not available")
