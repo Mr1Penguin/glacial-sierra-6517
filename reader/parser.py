@@ -54,7 +54,7 @@ class HTMLImgParser(HTMLParser):
                 src = "http:" + src
             try:
                 if re.search("""^http://""", src, flags = re.IGNORECASE) is None:
-                    img = urllib2("http://" + src)
+                    img = urllib2.urlopen("http://" + src)
                     src = "http://" + src 
                 else:
                     img = urllib2.urlopen(src)
