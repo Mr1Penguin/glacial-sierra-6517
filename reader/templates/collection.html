@@ -9,6 +9,9 @@
     {% bootstrap_javascript %}
     <title>Collection</title>
     <style>
+        body {
+            background-color: #f2f2f2;
+        }
         .header {
             height: 100px;
             margin-top: 5px;
@@ -131,6 +134,7 @@
             }
 
             $("#siteAddress").keyup(function(event){
+                $("#siteAddress").removeClass("has-error");
                 if(event.keyCode == 13){
                     $("#addSiteBtn").click();
                 }
@@ -165,7 +169,6 @@
 
             function addSite() {
                 var input = $("#siteAddress");
-                input.removeClass("has-error");
                 $(".site").removeClass("site-exists");
                 if (input.val() == '') {
                     input.addClass("has-error");
@@ -187,6 +190,8 @@
                                 $("#site-" + json.site_id).addClass("site-exists");
                                 setTimeout(function() { $("#site-" + json.site_id).removeClass("site-exists"); }, 5000);
                                 return;
+                            } else {
+                                input.addClass("has-error");
                             }
                             return;
                         }
