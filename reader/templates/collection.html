@@ -7,7 +7,7 @@
 
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <title></title>
+    <title>Collection</title>
     <style>
         .header {
             height: 100px;
@@ -45,6 +45,10 @@
         .site:hover .remove {
             display: inline;
         }
+        .ctrl {
+            float: none;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -66,7 +70,7 @@
                 <div class="input-group">
                     <input id="siteAddress" class="form-control" placeholder="Address">
                     <span class="input-group-btn">
-                        <button onclick="addSite()" class="btn btn-default">Add</button>
+                        <button onclick="addSite()" id="addSiteBtn" class="btn btn-default">Add</button>
                     </span>
                 </div>
             </div>
@@ -83,9 +87,55 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="col-sm-8 images">
+        <div class="col-sm-8">
+            <div class="row">
+                <div class="col-sm-2 col-md-offset-5">
+                    <a href="#" onclick="prevPage()">Previous</a>
+                    |
+                    <a href="#" onclick="nextPage()">Next</a>
+                </div>
+            </div>
+            <div class="images"></div>
         </div>
         <script>
+            var page = 1;
+            var pages = 1;
+            var images;
+
+            function renderPage() {
+                if(!images) return;
+                $(".images").html("");
+                $.each(images, function(arrayID, image) {
+                    if (!(arrayID < (page - 1) * 10 || arrayID > (page) * 10 - 1)) {
+                        var div = $("<div></div>").addClass("image");
+                        var img = $("<img>").attr({
+                            "src": image.url,
+                            "width": image.width > 600 ? 600 : image.width
+                        });
+                        div.append(img);
+                        $(".images").append(div);
+                    }
+                });
+            }
+
+            function nextPage() {
+                if(page == pages) return;
+                page++;
+                renderPage();
+            }
+
+            function prevPage() {
+                if(page == 1) return;
+                page--;
+                renderPage();
+            }
+
+            $("#siteAddress").keyup(function(event){
+                if(event.keyCode == 13){
+                    $("#addSiteBtn").click();
+                }
+            });
+
             function getCookie(name) {
                 var matches = document.cookie.match(new RegExp(
                         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -100,16 +150,10 @@
                     data: { "site_id": id },
                     //fill div.images
                     success: function(json) {
-                        $(".images").html("");
-                        $.each(json, function(arrayID, image) {
-                            var div = $("<div></div>").addClass("image");
-                            var img = $("<img>").attr({
-                                "src": image.url,
-                                "width": image.width > 600 ? 600 : image.width
-                            });
-                            div.append(img);
-                            $(".images").append(div);
-                        });
+                        images = json;
+                        page = 1;
+                        pages = Math.ceil(images.length / 10);
+                        renderPage();
                     },
 
                     error: function(xhr, errmsg, err) {
@@ -152,7 +196,7 @@
                         var split = url.split('/');
                         img.attr({
                             "height" : 16,
-                            "src" : json.favicon ? json.favicon : split[0] + '//' + split[2] + '/favicon.ico'
+                            "src" : json.custom_favicon ? json.custom_favicon : split[0] + '//' + split[2] + '/favicon.ico'
                         });
                         a.attr({
                             "href" : "#",
