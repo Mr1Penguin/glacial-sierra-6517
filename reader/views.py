@@ -10,7 +10,6 @@ from .forms import LoginForm
 from .parser import *
 from .data_base import *
 
-# Create your views here.
 def index(request):
     form = LoginForm()
     ren = None
@@ -27,7 +26,6 @@ def index(request):
             else:
                 content.update({"error": "User with this e-mail already exist!", "lastmail": request.POST.get('your_email'), "checkbox" : True})
         else:
-            # if correct load collection. else index with error
             curr.execute("select password from reader_user where user_email=(%s)", (request.POST.get('your_email'),))
             if curr.rowcount == 1:
                 passwd = curr.fetchone()[0]
@@ -84,7 +82,7 @@ def collection(request):
 
 def load_site(request):
     if request.method == "GET":
-        curr.execute("select url, width from reader_image where site_id=(%s)", (request.GET.get('site_id'),))
+        curr.execute("select url, width, id from reader_image where site_id=(%s) order by id", (request.GET.get('site_id'),))
         rows = curr.fetchall()
         sites = []
         for row in rows:
@@ -116,13 +114,10 @@ def add_site(request):
         if curr.rowcount != 0:
             return HttpResponse(create_json([9001, curr.fetchone()[0]], True), content_type="application/json")
         try:
-            #req = urllib2.Request(url)
-            #response = urllib2.urlopen(req)
             response = urllib2.urlopen(url)
         except urllib2.HTTPError as e:
             return HttpResponse(create_json([e.code], True), content_type="application/json")
         except Exception as e:
-            #print e.reason
             return HttpResponse(create_json([901], True), content_type="application/json")
         html = response.read()
         if not isinstance(html, unicode):
@@ -137,7 +132,7 @@ def add_site(request):
                         (select user_id from reader_user_token where token = (%s)))
                         returning id""", (url, get_token(request)))
         site_id = curr.fetchone()[0]
-        parser = HTMLImgParser(curr, site_id)
+        parser = HTMLImgParser(curr, site_id, url)
         parser.feed(unihtml)
         curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
         conn.commit()
