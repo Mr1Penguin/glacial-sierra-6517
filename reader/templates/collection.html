@@ -175,6 +175,7 @@
                     return;
                 }
                 var url = (/^http:\/\//.test(input.val()) ? '' : 'http://') + input.val();
+                $("#addSiteBtn").prop('disabled', true);
                 $.ajax({
                     url: "add_site/",
                     type: "POST",
@@ -218,6 +219,7 @@
                         div.append(svg);
                         $(".sites").append(div);
                         input.val('');
+                        $("#addSiteBtn").prop('disabled', false);
                     },
 
                     error: function(xhr, errmsg, err) {
