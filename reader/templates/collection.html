@@ -251,6 +251,8 @@
                         if(json.ok) {
                             $("#site-" + id).remove();
                         }
+                        $(".images").html("");
+                        page = pages = 1;
                     },
                     error: function(xhr, errmsg, err) {
                         console.log("We have encountered an error: "+ errmsg);
