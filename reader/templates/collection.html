@@ -52,6 +52,10 @@
             float: none;
             margin: 0 auto;
         }
+        .errorMsg {
+            height: 20px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +81,7 @@
                     </span>
                 </div>
             </div>
+            <div class="errorMsg">Site error: <span></span></div>
             <div class="sites">
                 {% for site in sites %}
                     <div id="site-{{ site.id }}" class="site">
@@ -169,12 +174,15 @@
 
             function addSite() {
                 var input = $("#siteAddress");
+                $(".errorMsg").css("display", "none");
                 $(".site").removeClass("site-exists");
+                input.parent().removeClass("has-error");
                 if (input.val() == '') {
-                    input.addClass("has-error");
+                    input.parent().addClass("has-error");
                     return;
                 }
                 var url = (/^http:\/\//.test(input.val()) ? '' : 'http://') + input.val();
+                $("#addSiteBtn").prop('disabled', true);
                 $.ajax({
                     url: "add_site/",
                     type: "POST",
@@ -185,14 +193,19 @@
                     //append div.sites
                     success: function(json) {
                         if(json.error) {
-                            input.addClass("has-error");
                             if(json.error == 9001) {
                                 $("#site-" + json.site_id).addClass("site-exists");
+                                $("#addSiteBtn").prop('disabled', false);
                                 setTimeout(function() { $("#site-" + json.site_id).removeClass("site-exists"); }, 5000);
                                 return;
                             } else {
-                                input.addClass("has-error");
+                                input.parent().addClass("has-error");
+                                if (json.error == 901)
+                                    json.error = 404;
+                                $(".errorMsg").css("display", "block");
+                                $(".errorMsg span").text(json.error);
                             }
+                            $("#addSiteBtn").prop('disabled', false);
                             return;
                         }
                         var div = $("<div></div>");
@@ -218,6 +231,7 @@
                         div.append(svg);
                         $(".sites").append(div);
                         input.val('');
+                        $("#addSiteBtn").prop('disabled', false);
                     },
 
                     error: function(xhr, errmsg, err) {
@@ -237,6 +251,8 @@
                         if(json.ok) {
                             $("#site-" + id).remove();
                         }
+                        $(".images").html("");
+                        page = pages = 1;
                     },
                     error: function(xhr, errmsg, err) {
                         console.log("We have encountered an error: "+ errmsg);
