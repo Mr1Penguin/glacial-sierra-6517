@@ -137,7 +137,8 @@ def add_site(request):
                         returning id""", (url, get_token(request)))
         site_id = curr.fetchone()[0]
         parser = HTMLImgParser(curr, site_id, url)
-        parser.feed(unihtml)
+        #parser.feed(unihtml)
+        parser.start_parser(unihtml)
         curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
         conn.commit()
         return HttpResponse(create_json([site_id, curr.fetchone()[0]], False), content_type="application/json")
