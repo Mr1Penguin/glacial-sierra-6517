@@ -30,9 +30,6 @@ class HTMLImgParser(HTMLParser):
         self.feed(unihtml)
         for x in range(self.process_count):
             self.q.put(("You", "must die", None))
-        #self.pool.close()
-        #self.pool.join()
-        #while (not self.resq.empty()):
         count = 0
         while (count < self.picture_count):
             count = count + 1

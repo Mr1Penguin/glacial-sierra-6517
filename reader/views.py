@@ -79,9 +79,8 @@ def collection(request):
                 ren = render(request, 'collection.html', content)
     if ren is None:
         ren = redirect('index')
-
-    send_mail('Subject here', 'Here is the message.', 'pacific-peak-8618@mail.ru',
-    ['mr1penguin@gmail.com'], fail_silently=False)
+    #send_mail('SPECIAL DELIVERY', 'FuckFuuuuuuck\n This shit is fuuuuck', 'pacific-peak-8618@mail.ru',
+    #['mr1penguin@gmail.com'], fail_silently=False)
     return ren
 
 def load_site(request):
@@ -137,7 +136,6 @@ def add_site(request):
                         returning id""", (url, get_token(request)))
         site_id = curr.fetchone()[0]
         parser = HTMLImgParser(curr, site_id, url)
-        #parser.feed(unihtml)
         parser.start_parser(unihtml)
         curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
         conn.commit()
@@ -154,4 +152,22 @@ def delete_site(request):
         content = collections.OrderedDict()
         content['ok'] = True
         return HttpResponse(json.dumps(content), content_type="application/json")
+    return HttpResponse("Not available")
+
+def restore(request):
+    if request.method == "GET":
+        email = request.GET.get('email', None)
+        if (email is not None):
+            curr.execute("""select password from reader_user where user_email = (%s) """, [email])
+            content = collections.OrderedDict()
+            if curr.rowcount == 0:
+                content['code'] = 1
+            else:
+                send_mail('SPECIAL DELIVERY', 'You password is here:\n' + curr.fetchone()[0], 'pacific-peak-8618@mail.ru',
+                        [email], fail_silently=False)
+                content['code'] = 0
+            #return HttpResponse(json.dumps(content), content_type="application/json")
+            return render(request, 'restore.html', content)
+        else:
+            return render(request, 'restore.html')
     return HttpResponse("Not available")
