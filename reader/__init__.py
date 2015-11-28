@@ -1,3 +1,1 @@
-from .data_base import *
-
-activate_base()
+default_app_config = 'reader.startup.Configuration'
