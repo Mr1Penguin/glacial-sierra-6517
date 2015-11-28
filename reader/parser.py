@@ -22,18 +22,20 @@ class HTMLImgParser(HTMLParser):
         self.manager = Manager()
         self.q = self.manager.Queue()
         self.resq = self.manager.Queue()
+        self.picture_count = 0
         HTMLParser.__init__(self)
     def start_parser(self, unihtml):
         args = ((ipid, self.q, self.resq) for ipid in range(self.process_count))
         self.result = self.pool.map_async(worker_loader, args)
         self.feed(unihtml)
-        #while (not self.q.empty()):
-            #time.sleep(0.1)
         for x in range(self.process_count):
             self.q.put(("You", "must die", None))
-        self.pool.close()
-        self.pool.join()
-        while (not self.resq.empty()):
+        #self.pool.close()
+        #self.pool.join()
+        #while (not self.resq.empty()):
+        count = 0
+        while (count < self.picture_count):
+            count = count + 1
             img = self.resq.get()
             if (img[0]):
                 if (img[1] is None):
@@ -41,6 +43,8 @@ class HTMLImgParser(HTMLParser):
                 else:
                     self.curr.execute("""insert into reader_image (url, site_id, add_date, width) 
                                         values ((%s), (%s), (select clock_timestamp()), (%s))""", [img[2], self.site_id, img[1]])
+        self.pool.close()
+        self.pool.join()
     def handle_starttag(self, tag, attrs):
         if tag == "noscript":
             self.noScript = True
@@ -51,12 +55,14 @@ class HTMLImgParser(HTMLParser):
         if tag == "img":
             for attr in attrs:
                 if attr[0] == "src":
+                    self.picture_count = self.picture_count + 1
                     self.q.put((attr[1], self.root_url, False))
         if tag == "link":
             for attr in attrs:
                 if attr[0] == "rel" and (attr[1] == "icon" or attr[1] == "shortcut icon"):
                     for attr2 in attrs:
                         if attr2[0] == "href":
+                            self.picture_count = self.picture_count + 1
                             self.q.put((attr2[1], self.root_url, True))
     def handle_endtag(self, tag):
         if tag == "noscript":
@@ -65,6 +71,7 @@ class HTMLImgParser(HTMLParser):
         if self.isTitle:
             self.isTitle = False
             self.curr.execute("""update reader_site set title = (%s) where id = (%s)""", (data, self.site_id))
+
 def open_picture(src, root_url, isFav):
     if src == "" :
         return [False, None, None]
@@ -96,7 +103,6 @@ def open_picture(src, root_url, isFav):
             else:
                 return [False, None, None]
         except Exception as e:
-            print "dermo"
             return [False, None, None]
     if (im.size[0] >= 200) and (im.size[1] >= 200):
         return [True, im.size[0], src]
@@ -105,17 +111,10 @@ def worker_loader((ipid, q, resq)):
     while (True):
         try:
             object = q.get()
-            #print object
             if object[2] is None:
                 break;
-            #object = q.get(False, 0.05)
             #print "Iam ", ipid, " work with ", object[0]
-            #print "work with ", object[0]
             resq.put(open_picture(object[0], object[1], object[2]))
-        #except Queue.Empty:
-            #Some problems with this exception
-            #print "Why I go to sleep?"
-            #time.sleep(0.1)
         except Exception, e:
             print "Not quite was planned ", e
             
