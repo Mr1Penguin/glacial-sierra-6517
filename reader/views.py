@@ -1,6 +1,7 @@
 import json
 import collections
 import urllib2
+from django.core.mail import send_mail
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -78,6 +79,9 @@ def collection(request):
                 ren = render(request, 'collection.html', content)
     if ren is None:
         ren = redirect('index')
+
+    send_mail('Subject here', 'Here is the message.', 'pacific-peak-8618@mail.ru',
+    ['mr1penguin@gmail.com'], fail_silently=False)
     return ren
 
 def load_site(request):

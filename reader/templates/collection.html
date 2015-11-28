@@ -10,6 +10,8 @@
     <title>Collection</title>
     <style>
         body {
+            background-image: url("https://pp.vk.me/c633426/v633426989/18bd/eQxaxRgbV1M.jpg");
+            background-size: 100% 285%;
             background-color: #eef;
         }
         .header {
@@ -86,7 +88,7 @@
                 {% for site in sites %}
                     <div id="site-{{ site.id }}" class="site">
                         <img src="{{ site.favicon }}"  height=16/>
-                        <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
+                        <a href="javascript:loadSite({{ site.id }})">{{ site.title }}</a>
                         <svg height="10" width="10" class="remove" onclick="deleteSite({{ site.id }})">
                             <line x1="0" y1="0" x2="10" y2="10" style="stroke:rgb(0,0,0);stroke-width:2" />
                             <line x1="0" y1="10" x2="10" y2="0" style="stroke:rgb(0,0,0);stroke-width:2" />

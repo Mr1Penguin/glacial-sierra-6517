@@ -23,7 +23,7 @@
         <div class="error">{{ error }}</div>
         <script>
             $(document).ready(function() {
-                $("#id_your_email").val("{{ lastmail }}")
+                $("#id_your_email").val("{{ lastmail }}");
                 {% if checkbox %}
                     $("#id_new_user").prop('checked', true);
                     toggled();
@@ -35,6 +35,10 @@
         <button type="submit" class="btn btn-primary" id="id_submit">
             {% bootstrap_icon "user" %} Sign in
         </button>
+        <a href="restore" class="btn btn-info" id="passrest" role="button">
+            Restore password
+        </a>
+	<span id="ok" style="display:none;"> {% bootstrap_icon "ok" %} </span>
     {% endbuttons %}
 </form>
 
@@ -42,22 +46,38 @@
 {% endblock %}
 
 <script>
-    function toggled() {
-        if (document.getElementById('id_new_user').checked) {
-            var newstr = document.getElementById('id_submit').innerHTML;
-            newstr_n = newstr.replace("in", "up");
-            document.getElementById('id_submit').innerHTML = newstr_n;
-            document.getElementById('id_submit').className =
-                    document.getElementById('id_submit').className.replace("primary", "success");
-        } else {
-            var newstr = document.getElementById('id_submit').innerHTML;
-            newstr_n = newstr.replace("up", "in");
-            document.getElementById('id_submit').innerHTML = newstr_n;
-            document.getElementById('id_submit').className =
-                    document.getElementById('id_submit').className.replace("success", "primary");
-        }
+function toggled() {
+    if (document.getElementById('id_new_user').checked) {
+        var newstr = document.getElementById('id_submit').innerHTML;
+        newstr_n = newstr.replace("in", "up");
+        document.getElementById('id_submit').innerHTML = newstr_n;
+        document.getElementById('id_submit').className =
+        document.getElementById('id_submit').className.replace("primary", "success");
+        $("#passrest").css("display", "none");
+    } else {
+        var newstr = document.getElementById('id_submit').innerHTML;
+        newstr_n = newstr.replace("up", "in");
+        document.getElementById('id_submit').innerHTML = newstr_n;
+        document.getElementById('id_submit').className =
+        document.getElementById('id_submit').className.replace("success", "primary");
+        $("#passrest").css("display", "inline-block");
     }
-    toggled();
+}
+toggled();
+/*$("#passrest").prop('disabled', !$("#id_your_email").val().length);
+$("#id_your_email").keyup(function(event) {
+    $("#passrest").prop('disabled', !$("#id_your_email").val().length);
+});
+function sendpsw() {
+    console.log("sps");
+    var so = true;
+    $("#ok").stop(so, true).fadeIn(200).delay(1000).fadeOut(200);
+/*    $.ajax({
+	url: "sendpsw/",
+	type: "GET",
+	data
+    });
+}*/
 </script>
 
 </body>
