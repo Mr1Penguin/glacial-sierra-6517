@@ -9,53 +9,56 @@
     {% bootstrap_javascript %}
     <title>Collection</title>
     <style>
-        body {
-            background-color: #eef;
-        }
-        .header {
-            height: 100px;
-            margin-top: 5px;
-        }
-        .userdata,
-        .logout {
-            text-align: right;
-        }
-        .userdata {
-            font-size: 20px;
-        }
-        .sites {
-            margin-top: 5px;
-        }
-        .site {
-            display: inline-block;
-            width: 100%;
-        }
-        .site-exists {
-            border-bottom: solid 1px red;
-        }
-        .image {
-            border: solid 1px black;
-            margin: 5px 0;
-        }
-        .image img {
-            display: block;
-            margin: auto;
-        }
-        .remove {
-            display: none;
-            cursor: pointer;
-        }
-        .site:hover .remove {
-            display: inline;
-        }
-        .ctrl {
-            float: none;
-            margin: 0 auto;
-        }
-        .errorMsg {
-            height: 20px;
-            display: none;
-        }
+    body {
+        background-color: #eef;
+    }
+    .header {
+        height: 100px;
+        margin-top: 5px;
+    }
+    .userdata,
+    .logout {
+        text-align: right;
+    }
+    .userdata {
+        font-size: 20px;
+    }
+    .sites {
+        margin-top: 5px;
+    }
+    .site {
+        display: inline-block;
+        width: 100%;
+    }
+    .site-exists {
+        border-bottom: solid 1px red;
+    }
+    .image {
+        border: solid 1px black;
+        margin: 5px 0;
+    }
+    .image img {
+        display: block;
+        margin: auto;
+    }
+    .remove {
+        display: none;
+        cursor: pointer;
+    }
+    .site:hover .remove {
+        display: inline;
+    }
+    .ctrl {
+        float: none;
+        margin: 0 auto;
+    }
+    .errorMsg {
+        height: 20px;
+        display: none;
+    }
+    #pager {
+	display: none;
+    }
     </style>
 </head>
 <body>
@@ -86,7 +89,7 @@
                 {% for site in sites %}
                     <div id="site-{{ site.id }}" class="site">
                         <img src="{{ site.favicon }}"  height=16/>
-                        <a href="javascript:loadSite({{ site.id }})">{{ site.title }}</a>
+                        <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
                         <svg height="10" width="10" class="remove" onclick="deleteSite({{ site.id }})">
                             <line x1="0" y1="0" x2="10" y2="10" style="stroke:rgb(0,0,0);stroke-width:2" />
                             <line x1="0" y1="10" x2="10" y2="0" style="stroke:rgb(0,0,0);stroke-width:2" />
@@ -97,9 +100,11 @@
         </div>
         <div class="col-sm-8">
             <div class="row">
-                <div class="col-sm-2 col-md-offset-5">
+                <div class="col-sm-4 col-md-offset-4" style="text-align:center">
                     <a href="#" onclick="prevPage()">Previous</a>
-                    |
+                    &lt;
+		    <span id="pager"><span id="current"></span> of <span id="total"></span></span>
+		    &gt;
                     <a href="#" onclick="nextPage()">Next</a>
                 </div>
             </div>
@@ -129,12 +134,14 @@
             function nextPage() {
                 if(page == pages) return;
                 page++;
+		$("#current").text(page);
                 renderPage();
             }
 
             function prevPage() {
                 if(page == 1) return;
                 page--;
+		$("#current").text(page);
                 renderPage();
             }
 
@@ -163,6 +170,9 @@
                         page = 1;
                         pages = Math.ceil(images.length / 10);
                         renderPage();
+			$("#pager").css("display","inline-block");
+			$("#total").text(pages);
+			$("#current").text(page);
                     },
 
                     error: function(xhr, errmsg, err) {
@@ -253,6 +263,7 @@
                         }
                         $(".images").html("");
                         page = pages = 1;
+			$("#pager").css("display","none");
                     },
                     error: function(xhr, errmsg, err) {
                         console.log("We have encountered an error: "+ errmsg);
