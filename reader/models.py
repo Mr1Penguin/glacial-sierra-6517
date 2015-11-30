@@ -26,9 +26,6 @@ class Image(models.Model):
     add_date = models.DateTimeField()
     width = models.IntegerField(default=600)
 
-    class Meta:
-        unique_together = ("url", "site")
-
 #check add date string if none exists
 class Collect(models.Model):
     collect_date = models.DateTimeField()

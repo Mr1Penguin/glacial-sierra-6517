@@ -1,14 +1,14 @@
 import json
 import collections
 import urllib2
-from django.core.mail import send_mail
 
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.middleware.csrf import get_token, rotate_token
 
 from .forms import LoginForm
-from .parser import *
+from .htmlimgparser import *
 from .data_base import *
 
 def index(request):
@@ -79,8 +79,6 @@ def collection(request):
                 ren = render(request, 'collection.html', content)
     if ren is None:
         ren = redirect('index')
-    #send_mail('SPECIAL DELIVERY', 'FuckFuuuuuuck\n This shit is fuuuuck', 'pacific-peak-8618@mail.ru',
-    #['mr1penguin@gmail.com'], fail_silently=False)
     return ren
 
 def load_site(request):

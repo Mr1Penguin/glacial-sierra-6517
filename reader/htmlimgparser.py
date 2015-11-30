@@ -7,6 +7,7 @@ import re
 import urllib2
 import datetime
 import logging
+import psycopg2
 from multiprocessing import Pool, Manager
 import time
 
@@ -36,10 +37,10 @@ class HTMLImgParser(HTMLParser):
             img = self.resq.get()
             if (img[0]):
                 if (img[1] is None):
-                    self.curr.execute("""update reader_site set favicon = (%s) where id = (%s)""", [img[2], self.site_id])
+                        self.curr.execute("""update reader_site set favicon = (%s) where id = (%s)""", [img[2], self.site_id])
                 else:
                     self.curr.execute("""insert into reader_image (url, site_id, add_date, width) 
-                                        values ((%s), (%s), (select clock_timestamp()), (%s))""", [img[2], self.site_id, img[1]])
+                                            values ((%s), (%s), (select clock_timestamp()), (%s))""", [img[2], self.site_id, img[1]])
         self.pool.close()
         self.pool.join()
     def handle_starttag(self, tag, attrs):

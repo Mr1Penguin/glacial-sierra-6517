@@ -4,4 +4,5 @@ class Configuration(AppConfig):
     name = 'reader'
     def ready(self):
         activate_base()
+        add_trigger()
         
