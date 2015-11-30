@@ -161,13 +161,13 @@ def restore(request):
             curr.execute("""select password from reader_user where user_email = (%s) """, [email])
             content = collections.OrderedDict()
             if curr.rowcount == 0:
-                content['code'] = 1
+                content['code'] = 201
             else:
                 send_mail('SPECIAL DELIVERY', 'You password is here:\n' + curr.fetchone()[0], 'pacific-peak-8618@mail.ru',
                         [email], fail_silently=False)
-                content['code'] = 0
-            #return HttpResponse(json.dumps(content), content_type="application/json")
+                content['code'] = 200
             return render(request, 'restore.html', content)
         else:
-            return render(request, 'restore.html')
+            content['code'] = 202
+        return render(request, 'restore.html', content)
     return HttpResponse("Not available")
