@@ -17,22 +17,22 @@ def index(request):
     content = {"form" : form}
     if request.method == "POST":
         if request.POST.get('new_user'):
-            curr.execute("select user_email from reader_user where user_email=(%s)", (request.POST.get('your_email'),))
+            curr.execute("select user_email from reader_user where user_email=(lower(%s))", (request.POST.get('your_email'),))
             if curr.rowcount == 0:
                 rotate_token(request)
-                curr.execute("insert into reader_user (user_email, password) values (%s, %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK')))
-                curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
+                curr.execute("insert into reader_user (user_email, password) values (lower(%s), %s)", (request.POST.get('your_email', 'FUCK'), request.POST.get('password', 'FUCK')))
+                curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(lower(%s))), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
                 conn.commit()
                 ren = redirect('collection')
             else:
                 content.update({"error": "User with this e-mail already exist!", "lastmail": request.POST.get('your_email'), "checkbox" : True})
         else:
-            curr.execute("select password from reader_user where user_email=(%s)", (request.POST.get('your_email'),))
+            curr.execute("select password from reader_user where user_email=(lower(%s))", (request.POST.get('your_email'),))
             if curr.rowcount == 1:
                 passwd = curr.fetchone()[0]
                 if passwd == request.POST.get('password'):
                     rotate_token(request)
-                    curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(%s)), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
+                    curr.execute("insert into reader_user_token (user_id, last_use, token) values ((select id from reader_user where user_email=(lower(%s))), (select clock_timestamp()), %s)", (request.POST.get('your_email', 'FUCK'), get_token(request)))
                     conn.commit()
                     ren = redirect('collection')
                 else:
@@ -123,6 +123,7 @@ def add_site(request):
         html = response.read()
         if not isinstance(html, unicode):
             try: 
+                print html
                 unihtml = unicode(html, 'utf-8')
             except UnicodeError:
                 unihtml = html.decode('cp1251').encode('utf8')
@@ -155,9 +156,9 @@ def delete_site(request):
 def restore(request):
     if request.method == "GET":
         email = request.GET.get('email', None)
+        content = collections.OrderedDict()
         if (email is not None):
-            curr.execute("""select password from reader_user where user_email = (%s) """, [email])
-            content = collections.OrderedDict()
+            curr.execute("""select password from reader_user where user_email = (lower(%s)) """, [email])
             if curr.rowcount == 0:
                 content['code'] = 201
             else:

@@ -15,7 +15,7 @@ if __name__ == '__main__':
         try:
             response = urllib2.urlopen(url)
         except Exception as e:
-            print e
+            print e, url
             pass
         else:
             html = response.read()
