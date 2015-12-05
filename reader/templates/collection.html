@@ -191,7 +191,7 @@
                     input.parent().addClass("has-error");
                     return;
                 }
-                var url = (/^https?:\/\//.test(input.val()) ? '' : 'http://') + input.val();
+                var url = (/^ *https?:\/\//.test(input.val()) ? '' : 'http://') + input.val();
                 $("#addSiteBtn").prop('disabled', true);
                 $.ajax({
                     url: "add_site/",

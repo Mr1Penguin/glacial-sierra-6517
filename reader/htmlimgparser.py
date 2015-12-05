@@ -73,13 +73,14 @@ class HTMLImgParser(HTMLParser):
 def open_picture(src, root_url, isFav):
     if src == "" :
         return [False, None, None]
+    src = src.lstrip()
     if re.search("""^data:image/""", src, flags = re.IGNORECASE) is not None:  
         im = Image.open(BytesIO(base64.b64decode(re.sub("""^data:image/.*?;base64,""", "", src, flags = re.IGNORECASE))))
     else:
         if re.search("""^//""", src, flags = re.IGNORECASE) is not None:
             src = "http:" + src
         try:
-            if re.search("""^http://""", src, flags = re.IGNORECASE) is None:
+            if re.search("""^https?://""", src, flags = re.IGNORECASE) is None:
                 img = urllib2.urlopen("http://" + src)
                 src = "http://" + src 
             else:
