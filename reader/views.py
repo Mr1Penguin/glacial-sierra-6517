@@ -1,6 +1,7 @@
 import json
 import collections
 import urllib2
+import gzip
 
 from django.core.mail import send_mail
 from django.http import HttpResponse
@@ -116,16 +117,28 @@ def add_site(request):
             return HttpResponse(create_json([9001, curr.fetchone()[0]], True), content_type="application/json")
         try:
             response = urllib2.urlopen(url)
+            #it prints encoding from content-type
+            #print response.headers['content-type'].split('charset=')[-1]
+            #it prints None if we load html or gzip if not
+            #print response.info().get('Content-Encoding')
         except urllib2.HTTPError as e:
             return HttpResponse(create_json([e.code], True), content_type="application/json")
         except Exception as e:
             return HttpResponse(create_json([901], True), content_type="application/json")
-        html = response.read()
+        if response.info().get('Content-Encoding') == 'gzip':
+            buf = StringIO.StringIO(response.read())
+            gzip_f = gzip.GzipFile(fileobj=buf)
+            html = gzip_f.read()
+        else:
+            html = response.read()
         if not isinstance(html, unicode):
             try: 
-                unihtml = unicode(html, 'utf-8')
-            except UnicodeError:
-                unihtml = html.decode('cp1251').encode('utf8')
+                unihtml = unicode(html, 'utf8')
+            except UnicodeError as e:
+                try:
+                    unihtml = html.decode('cp1251').encode('utf8')
+                except Exception as e:
+                    return HttpResponse(create_json([902], True), content_type="application/json")
         else:
             unihtml = html
         curr.execute("""insert into reader_site (url, add_date, user_id) 
