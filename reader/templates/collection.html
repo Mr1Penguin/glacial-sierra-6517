@@ -132,14 +132,14 @@
             }
 
             function nextPage() {
-                if(page == pages) return;
+                if(page == pages || pages == 0) return;
                 page++;
 		$("#current").text(page);
                 renderPage();
             }
 
             function prevPage() {
-                if(page == 1) return;
+                if(page == 1 || pages == 0) return;
                 page--;
 		$("#current").text(page);
                 renderPage();
@@ -191,7 +191,7 @@
                     input.parent().addClass("has-error");
                     return;
                 }
-                var url = (/^http:\/\//.test(input.val()) ? '' : 'http://') + input.val();
+                var url = (/^https?:\/\//.test(input.val()) ? '' : 'http://') + input.val();
                 $("#addSiteBtn").prop('disabled', true);
                 $.ajax({
                     url: "add_site/",
@@ -213,7 +213,10 @@
                                 if (json.error == 901)
                                     json.error = 404;
                                 $(".errorMsg").css("display", "block");
-                                $(".errorMsg span").text(json.error);
+				if (json.error != 902)
+                                    $(".errorMsg span").text(json.error);
+				else
+				    $(".errorMsg span").text("unreadable content");
                             }
                             $("#addSiteBtn").prop('disabled', false);
                             return;
