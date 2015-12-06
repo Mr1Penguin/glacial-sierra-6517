@@ -132,14 +132,18 @@ def add_site(request):
             html = gzip_f.read()
         else:
             html = response.read()
+        encoding = response.headers.getparam('charset')
         if not isinstance(html, unicode):
-            try: 
+            try:
                 unihtml = unicode(html, 'utf8')
             except UnicodeError as e:
                 try:
-                    unihtml = html.decode('cp1251').encode('utf8')
+                    unihtml = html.decode(encoding).encode('utf8')
                 except Exception as e:
-                    return HttpResponse(create_json([902], True), content_type="application/json")
+                    try:
+                        unihtml = html.decode('cp1251').encode('utf8')
+                    except Exception as e:
+                        return HttpResponse(create_json([902], True), content_type="application/json")
         else:
             unihtml = html
         curr.execute("""insert into reader_site (url, add_date, user_id) 

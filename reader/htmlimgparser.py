@@ -87,10 +87,19 @@ def open_picture(src, root_url, isFav):
                 img = urllib2.urlopen(src)
         except Exception:
             try:
-                img = urllib2.urlopen(root_url + "/" + src)
-                src = root_url + "/" + src 
+                parse_url = re.findall("(^.*/.*)\?.*", root_url, flags = re.IGNORECASE)
+                if parse_url:
+                    new_root = parse_url[0]
+                else:
+                    new_root = root_url
+                img = urllib2.urlopen(new_root + "/" + src)
+                src = new_root + "/" + src 
             except Exception:
-                return [False, None, None]
+                try:
+                    return [False, None, None]#check for .smth
+                except Exception:
+                    print src
+                    return [False, None, None]
         if isFav:
             return [True, None, src]
         html = img.read()
