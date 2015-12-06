@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -191,7 +191,8 @@
                     input.parent().addClass("has-error");
                     return;
                 }
-                var url = (/^ *https?:\/\//.test(input.val()) ? '' : 'http://') + input.val();
+                var tmp = input.val().trim();
+                var url = (/^https?:\/\//.test(tmp) ? '' : 'http://') + tmp;
                 $("#addSiteBtn").prop('disabled', true);
                 $.ajax({
                     url: "add_site/",
