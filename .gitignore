@@ -4,3 +4,5 @@ staticfiles
 
 .idea/
 *~
+reader/data_base.py
+MNreader/settings.py

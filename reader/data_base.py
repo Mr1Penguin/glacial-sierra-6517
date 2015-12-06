@@ -9,8 +9,8 @@ def activate_base():
     try :
         global conn
         global curr
-        #conn = psycopg2.connect("dbname='mnreader' user='mpreader' password='MPreader' host='127.0.0.1'")
-        conn = psycopg2.connect("dbname='postgres' user='postgres' host='db'")
+        conn = psycopg2.connect("dbname='mnreader' user='mpreader' password='MPreader' host='127.0.0.1'")
+        #conn = psycopg2.connect("dbname='postgres' user='postgres' host='db'")
         curr = conn.cursor()
     except Exception, e:
         print e

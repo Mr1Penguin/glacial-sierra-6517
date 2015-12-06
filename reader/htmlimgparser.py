@@ -73,7 +73,7 @@ class HTMLImgParser(HTMLParser):
 def open_picture(src, root_url, isFav):
     if src == "" :
         return [False, None, None]
-    src = src.lstrip()
+    src = src.strip()   
     if re.search("""^data:image/""", src, flags = re.IGNORECASE) is not None:  
         im = Image.open(BytesIO(base64.b64decode(re.sub("""^data:image/.*?;base64,""", "", src, flags = re.IGNORECASE))))
     else:

@@ -111,6 +111,7 @@ def add_site(request):
                     content['custom_favicon'] = curr.fetchone()[0]
             return json.dumps(content)
         url = request.POST.get('url')
+        url = url.strip()
         curr.execute("""select id from reader_site where url = (%s)
                         and user_id = (select user_id from reader_user_token where token = (%s))""", (url, get_token(request)))
         if curr.rowcount != 0:

@@ -77,14 +77,14 @@ WSGI_APPLICATION = 'MNreader.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = { #'default': dj_database_url.config()
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
-    }
+DATABASES = { 'default': dj_database_url.config()
+    #'default': {
+        #'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        #'NAME': 'postgres',
+        #'USER': 'postgres',
+        #'HOST': 'db',
+        #'PORT': 5432,
+    #}
 }
 
 BOOTSTRAP3 = {
