@@ -11,6 +11,7 @@ import psycopg2
 from multiprocessing import Pool, Manager
 import time
 import numbers
+import gzip
 
 class HTMLImgParser(HTMLParser):
     def __init__(self, cursor, siteid, url):
@@ -142,7 +143,12 @@ def load_picture(src, root_url, isFav):
         return [True, im.size[0], src]
     return [False, None, None]
 def open_picture(img, src):
-    html = img.read()
+    if img.info().get('Content-Encoding') == 'gzip':
+        buf = StringIO.StringIO(img.read())
+        gzip_f = gzip.GzipFile(fileobj=buf)
+        html = gzip_f.read()
+    else:
+        html = img.read()
     try :
         im = Image.open(StringIO.StringIO(html))
     except IOError as e:
