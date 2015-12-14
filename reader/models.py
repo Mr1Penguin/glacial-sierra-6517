@@ -19,6 +19,7 @@ class Site(models.Model):
     add_date = models.DateTimeField()
     user = models.ForeignKey(User)
     title = models.CharField(max_length=255, null=True)
+    is_active = models.BooleanField(default = True)
 
 class Image(models.Model):
     url = models.TextField()

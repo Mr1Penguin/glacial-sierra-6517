@@ -66,7 +66,7 @@ def collection(request):
                 curr.execute("""select user_email from reader_user where id = 
                                 (select user_id from reader_user_token where token=(%s))""", (get_token(request),))
                 content = {"email" : curr.fetchone()[0]}
-                curr.execute("select id, title, url, favicon from reader_site where user_id = (select user_id from reader_user_token where token=(%s)) order by id", (get_token(request),))
+                curr.execute("select id, title, url, favicon, is_active from reader_site where user_id = (select user_id from reader_user_token where token=(%s)) order by id", (get_token(request),))
                 rows = curr.fetchall()
                 rowarray = []
                 for row in rows:
@@ -74,8 +74,8 @@ def collection(request):
                     d['id'] = row[0]
                     d['title'] = row[1]
                     dd = row[2].split('/')
-                    print row[3]
                     d['favicon'] = row[3] or (('http://' + dd[0] if dd[0] != 'http:' else dd[0] + '//' +  dd[2]) + '/favicon.ico')
+                    d['is_active'] = row[4]
                     rowarray.append(d)
                 content.update({"sites" : rowarray})
                 ren = render(request, 'collection.html', content)
@@ -147,14 +147,14 @@ def add_site(request):
                         return HttpResponse(create_json([902], True), content_type="application/json")
         else:
             unihtml = html
-        curr.execute("""insert into reader_site (url, add_date, user_id) 
-                        values ((%s), (select clock_timestamp()), 
+        curr.execute("""insert into reader_site (url, add_date, is_active, user_id) 
+                        values ((%s), (select clock_timestamp()), False, 
                         (select user_id from reader_user_token where token = (%s)))
                         returning id""", (url, get_token(request)))
         site_id = curr.fetchone()[0]
         parser = HTMLImgParser(curr, site_id, url)
         parser.start_parser(unihtml)
-        curr.execute("""select title from reader_site where id = (%s)""", (site_id,))
+        curr.execute("""update reader_site set is_active = True where id = (%s) returning title""", (site_id,))
         conn.commit()
         return HttpResponse(create_json([site_id, curr.fetchone()[0]], False), content_type="application/json")
     return HttpResponse("Not available")

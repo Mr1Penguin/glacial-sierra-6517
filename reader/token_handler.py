@@ -11,6 +11,7 @@ if __name__ == '__main__':
     curr.execute("""select id, url from reader_site""")
     sites = curr.fetchall()
     for site in sites:
+        curr.execute("""update reader_site set is_active = False where id = (%s)""", [site[0]])
         url = site[1]
         try:
             response = urllib2.urlopen(url)
@@ -28,6 +29,7 @@ if __name__ == '__main__':
                 unihtml = html
             parserst = htmlimgparser.HTMLImgParser(curr, site[0], url)
             parserst.start_parser(unihtml)
+        curr.execute("""update reader_site set is_active = True where id = (%s)""", [site[0]])
   
     conn.commit()
     curr.close()
