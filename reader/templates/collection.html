@@ -150,7 +150,7 @@
         }
 
         $("#siteAddress").keyup(function(event){
-	  if($('#addSiteBtn').prop('disabled')) { console.log('kok'); return; }
+	  if($('#addSiteBtn').prop('disabled')) return;
           $("#siteAddress").removeClass("has-error");
           if(event.keyCode == 13){
             $("#addSiteBtn").click();

@@ -142,6 +142,8 @@ def load_picture(src, root_url, isFav):
         return [True, im.size[0], src]
     return [False, None, None]
 def open_picture(img, src):
+    print 'test'
+    print img.info().get('Content-Encoding')
     html = img.read()
     try :
         im = Image.open(StringIO.StringIO(html))
