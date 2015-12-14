@@ -74,6 +74,7 @@ def collection(request):
                     d['id'] = row[0]
                     d['title'] = row[1]
                     dd = row[2].split('/')
+                    print row[3]
                     d['favicon'] = row[3] or (('http://' + dd[0] if dd[0] != 'http:' else dd[0] + '//' +  dd[2]) + '/favicon.ico')
                     rowarray.append(d)
                 content.update({"sites" : rowarray})
