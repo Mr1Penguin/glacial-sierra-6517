@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     {% load bootstrap3 %}
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -10,273 +10,278 @@
     <title>Collection</title>
     <style>
     body {
-        background-color: #eef;
+      background-color: #eef;
     }
     .header {
-        height: 100px;
-        margin-top: 5px;
+      height: 100px;
+      margin-top: 5px;
     }
     .userdata,
     .logout {
-        text-align: right;
+      text-align: right;
     }
     .userdata {
-        font-size: 20px;
+      font-size: 20px;
     }
     .sites {
-        margin-top: 5px;
+      margin-top: 5px;
     }
     .site {
-        display: inline-block;
-        width: 100%;
+      display: inline-block;
+      width: 100%;
     }
     .site-exists {
-        border-bottom: solid 1px red;
+      border-bottom: solid 1px red;
     }
     .image {
-        border: solid 1px black;
-        margin: 5px 0;
+      border: solid 1px black;
+      margin: 5px 0;
     }
     .image img {
-        display: block;
-        margin: auto;
+      display: block;
+      margin: auto;
     }
     .remove {
-        display: none;
-        cursor: pointer;
+      display: none;
+      cursor: pointer;
     }
     .site:hover .remove {
-        display: inline;
+      display: inline;
     }
     .ctrl {
-        float: none;
-        margin: 0 auto;
+      float: none;
+      margin: 0 auto;
     }
     .errorMsg {
-        height: 20px;
-        display: none;
+      height: 20px;
+      display: none;
     }
     #pager {
-	display: none;
+      display: none;
     }
     </style>
-</head>
-<body>
-<div class="container">
-    <div class="row">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
         <div class="col-sm-12 header">
-            <div class="userdata">{{ email }}</div>
-            <form action="/collection/" method="post">
-                {% csrf_token %}
-                <div class="logout">
-                    <input type="submit" class="btn btn-danger" value="Log out"/>
-                </div>
-            </form>
+          <div class="userdata">{{ email }}</div>
+          <form action="/collection/" method="post">
+            {% csrf_token %}
+            <div class="logout">
+              <input type="submit" class="btn btn-danger" value="Log out"/>
+            </div>
+          </form>
         </div>
-    </div>
-    <div class="row">
+      </div>
+      <div class="row">
         <div class="col-sm-4">
-            <div id="addSiteForm">
-                <div class="input-group">
-                    <input id="siteAddress" class="form-control" placeholder="Address">
-                    <span class="input-group-btn">
-                        <button onclick="addSite()" id="addSiteBtn" class="btn btn-default">Add</button>
-                    </span>
-                </div>
+          <div id="addSiteForm">
+            <div class="input-group">
+              <input id="siteAddress" class="form-control" placeholder="Address">
+              <span class="input-group-btn">
+                <button onclick="addSite()" id="addSiteBtn" class="btn btn-default">Add</button>
+              </span>
             </div>
-            <div class="errorMsg">Site error: <span></span></div>
-            <div class="sites">
-                {% for site in sites %}
-                    <div id="site-{{ site.id }}" class="site">
-                        <img src="{{ site.favicon }}"  height=16/>
-                        <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
-                        <svg height="10" width="10" class="remove" onclick="deleteSite({{ site.id }})">
-                            <line x1="0" y1="0" x2="10" y2="10" style="stroke:rgb(0,0,0);stroke-width:2" />
-                            <line x1="0" y1="10" x2="10" y2="0" style="stroke:rgb(0,0,0);stroke-width:2" />
-                        </svg>
-                    </div>
-                {% endfor %}
+          </div>
+          <div class="errorMsg">Site error: <span></span></div>
+          <div class="sites">
+            {% for site in sites %}
+            <div id="site-{{ site.id }}" class="site">
+              <img src="{{ site.favicon }}"  height=16/>
+	      {% if site.is_active %}
+              <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
+              <svg height="10" width="10" class="remove" onclick="deleteSite({{ site.id }})">
+                <line x1="0" y1="0" x2="10" y2="10" style="stroke:rgb(0,0,0);stroke-width:2" />
+                <line x1="0" y1="10" x2="10" y2="0" style="stroke:rgb(0,0,0);stroke-width:2" />
+              </svg>
+	      {% else %}
+	      <span style="color: #444">{{ site.title }}</span>
+	      {% endif %}
             </div>
+            {% endfor %}
+          </div>
         </div>
         <div class="col-sm-8">
-            <div class="row">
-                <div class="col-sm-4 col-md-offset-4" style="text-align:center">
-                    <a href="#" onclick="prevPage()">Previous</a>
-                    &lt;
-		    <span id="pager"><span id="current"></span> of <span id="total"></span></span>
-		    &gt;
-                    <a href="#" onclick="nextPage()">Next</a>
-                </div>
+          <div class="row">
+            <div class="col-sm-4 col-md-offset-4" style="text-align:center">
+              <a href="#" onclick="prevPage()">Previous</a>
+              &lt;
+	      <span id="pager"><span id="current"></span> of <span id="total"></span></span>
+	      &gt;
+              <a href="#" onclick="nextPage()">Next</a>
             </div>
-            <div class="images"></div>
+          </div>
+          <div class="images"></div>
         </div>
         <script>
-            var page = 1;
-            var pages = 1;
-            var images;
+        var page = 1;
+        var pages = 1;
+        var images;
 
-            function renderPage() {
-                if(!images) return;
-                $(".images").html("");
-                $.each(images, function(arrayID, image) {
-                    if (!(arrayID < (page - 1) * 10 || arrayID > (page) * 10 - 1)) {
-                        var div = $("<div></div>").addClass("image");
-                        var img = $("<img>").attr({
-                            "src": image.url,
-                            "width": image.width > 600 ? 600 : image.width
-                        });
-                        div.append(img);
-                        $(".images").append(div);
-                    }
-                });
+        function renderPage() {
+          if(!images) return;
+          $(".images").html("");
+          $.each(images, function(arrayID, image) {
+            if (!(arrayID < (page - 1) * 10 || arrayID > (page) * 10 - 1)) {
+              var div = $("<div></div>").addClass("image");
+              var img = $("<img>").attr({
+                "src": image.url,
+                "width": image.width > 600 ? 600 : image.width
+              });
+              div.append(img);
+              $(".images").append(div);
             }
+          });
+        }
 
-            function nextPage() {
-                if(page == pages || pages == 0) return;
-                page++;
-		$("#current").text(page);
-                renderPage();
+        function nextPage() {
+          if(page == pages || pages == 0) return;
+          page++;
+	  $("#current").text(page);
+          renderPage();
+        }
+
+        function prevPage() {
+          if(page == 1 || pages == 0) return;
+          page--;
+	  $("#current").text(page);
+          renderPage();
+        }
+
+        $("#siteAddress").keyup(function(event){
+	  if($('#addSiteBtn').prop('disabled')) { console.log('kok'); return; }
+          $("#siteAddress").removeClass("has-error");
+          if(event.keyCode == 13){
+            $("#addSiteBtn").click();
+          }
+        });
+
+        function getCookie(name) {
+          var matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+          ));
+          return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+        //ajax callers and callbacks
+        function loadSite(id) {
+          $.ajax({
+            url: "load_site", //new view
+            type: "GET",
+            data: { "site_id": id },
+            //fill div.images
+            success: function(json) {
+              images = json;
+              page = 1;
+              pages = Math.ceil(images.length / 10);
+              renderPage();
+	      $("#pager").css("display","inline-block");
+	      $("#total").text(pages);
+	      $("#current").text(page);
+            },
+
+            error: function(xhr, errmsg, err) {
+              console.log("We have encountered an error: "+ errmsg);
+              console.log(xhr.status + ": " + xhr.responseText);
             }
+          });
+        }
 
-            function prevPage() {
-                if(page == 1 || pages == 0) return;
-                page--;
-		$("#current").text(page);
-                renderPage();
-            }
-
-            $("#siteAddress").keyup(function(event){
-                $("#siteAddress").removeClass("has-error");
-                if(event.keyCode == 13){
-                    $("#addSiteBtn").click();
+        function addSite() {
+          var input = $("#siteAddress");
+          $(".errorMsg").css("display", "none");
+          $(".site").removeClass("site-exists");
+          input.parent().removeClass("has-error");
+          if (input.val() == '') {
+            input.parent().addClass("has-error");
+            return;
+          }
+          var tmp = input.val().trim();
+          var url = (/^https?:\/\//.test(tmp) ? '' : 'http://') + tmp;
+          $("#addSiteBtn").prop('disabled', true);
+          $.ajax({
+            url: "add_site/",
+            type: "POST",
+            headers: {"X-CSRFToken": getCookie("csrftoken")},
+            data: {
+              "url" : url
+            },
+            //append div.sites
+            success: function(json) {
+              if(json.error) {
+                if(json.error == 9001) {
+                  $("#site-" + json.site_id).addClass("site-exists");
+                  $("#addSiteBtn").prop('disabled', false);
+                  setTimeout(function() { $("#site-" + json.site_id).removeClass("site-exists"); }, 5000);
+                  return;
+                } else {
+                  input.parent().addClass("has-error");
+                  if (json.error == 901)
+                    json.error = 404;
+                  $(".errorMsg").css("display", "block");
+		  if (json.error != 902)
+                    $(".errorMsg span").text(json.error);
+		  else
+		    $(".errorMsg span").text("unreadable content");
                 }
-            });
+                $("#addSiteBtn").prop('disabled', false);
+                return;
+              }
+              var div = $("<div></div>");
+              var img = $("<img>");
+              var a = $("<a></a>");
+              var split = url.split('/');
+              img.attr({
+                "height" : 16,
+                "src" : json.custom_favicon ? json.custom_favicon : split[0] + '//' + split[2] + '/favicon.ico'
+              });
+              a.attr({
+                "href" : "#",
+                "onclick" : "loadSite(" + json.site_id + ")"
+              });
+              a.text(json.title);
+              var svg = "<svg width='10' height='10' class='remove' onclick='deleteSite(" + json.site_id + ")'><line x1='0' x2='10' y1='0' y2='10' style='stroke:rgb(0,0,0);stroke-width:2'/><line x1='0' x2='10' y1='10' y2='0' style='stroke:rgb(0,0,0);stroke-width:2'/></svg>"
+              div.addClass("site");
+              div.attr("id", "site-" + json.site_id);
+              div.append(img);
+              div.append(" ");
+              div.append(a);
+              div.append(" ");
+              div.append(svg);
+              $(".sites").append(div);
+              input.val('');
+              $("#addSiteBtn").prop('disabled', false);
+            },
 
-            function getCookie(name) {
-                var matches = document.cookie.match(new RegExp(
-                        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-                ));
-                return matches ? decodeURIComponent(matches[1]) : undefined;
+            error: function(xhr, errmsg, err) {
+              console.log("We have encountered an error: "+ errmsg);
+              console.log(xhr.status + ": " + xhr.responseText);
             }
-            //ajax callers and callbacks
-            function loadSite(id) {
-                $.ajax({
-                    url: "load_site", //new view
-                    type: "GET",
-                    data: { "site_id": id },
-                    //fill div.images
-                    success: function(json) {
-                        images = json;
-                        page = 1;
-                        pages = Math.ceil(images.length / 10);
-                        renderPage();
-			$("#pager").css("display","inline-block");
-			$("#total").text(pages);
-			$("#current").text(page);
-                    },
+          });
+        }
 
-                    error: function(xhr, errmsg, err) {
-                        console.log("We have encountered an error: "+ errmsg);
-                        console.log(xhr.status + ": " + xhr.responseText);
-                    }
-                });
+        function deleteSite(id) {
+          $.ajax({
+            url: "delete_site/",
+            type: "POST",
+            headers: {"X-CSRFToken": getCookie("csrftoken")},
+            data: { "site_id" : id },
+            success: function(json) {
+              if(json.ok) {
+                $("#site-" + id).remove();
+              }
+              $(".images").html("");
+              page = pages = 1;
+	      $("#pager").css("display","none");
+            },
+            error: function(xhr, errmsg, err) {
+              console.log("We have encountered an error: "+ errmsg);
+              console.log(xhr.status + ": " + xhr.responseText);
             }
-
-            function addSite() {
-                var input = $("#siteAddress");
-                $(".errorMsg").css("display", "none");
-                $(".site").removeClass("site-exists");
-                input.parent().removeClass("has-error");
-                if (input.val() == '') {
-                    input.parent().addClass("has-error");
-                    return;
-                }
-                var tmp = input.val().trim();
-                var url = (/^https?:\/\//.test(tmp) ? '' : 'http://') + tmp;
-                $("#addSiteBtn").prop('disabled', true);
-                $.ajax({
-                    url: "add_site/",
-                    type: "POST",
-                    headers: {"X-CSRFToken": getCookie("csrftoken")},
-                    data: {
-                        "url" : url
-                    },
-                    //append div.sites
-                    success: function(json) {
-                        if(json.error) {
-                            if(json.error == 9001) {
-                                $("#site-" + json.site_id).addClass("site-exists");
-                                $("#addSiteBtn").prop('disabled', false);
-                                setTimeout(function() { $("#site-" + json.site_id).removeClass("site-exists"); }, 5000);
-                                return;
-                            } else {
-                                input.parent().addClass("has-error");
-                                if (json.error == 901)
-                                    json.error = 404;
-                                $(".errorMsg").css("display", "block");
-				if (json.error != 902)
-                                    $(".errorMsg span").text(json.error);
-				else
-				    $(".errorMsg span").text("unreadable content");
-                            }
-                            $("#addSiteBtn").prop('disabled', false);
-                            return;
-                        }
-                        var div = $("<div></div>");
-                        var img = $("<img>");
-                        var a = $("<a></a>");
-                        var split = url.split('/');
-                        img.attr({
-                            "height" : 16,
-                            "src" : json.custom_favicon ? json.custom_favicon : split[0] + '//' + split[2] + '/favicon.ico'
-                        });
-                        a.attr({
-                            "href" : "#",
-                            "onclick" : "loadSite(" + json.site_id + ")"
-                        });
-                        a.text(json.title);
-                        var svg = "<svg width='10' height='10' class='remove' onclick='deleteSite(" + json.site_id + ")'><line x1='0' x2='10' y1='0' y2='10' style='stroke:rgb(0,0,0);stroke-width:2'/><line x1='0' x2='10' y1='10' y2='0' style='stroke:rgb(0,0,0);stroke-width:2'/></svg>"
-                        div.addClass("site");
-                        div.attr("id", "site-" + json.site_id);
-                        div.append(img);
-                        div.append(" ");
-                        div.append(a);
-                        div.append(" ");
-                        div.append(svg);
-                        $(".sites").append(div);
-                        input.val('');
-                        $("#addSiteBtn").prop('disabled', false);
-                    },
-
-                    error: function(xhr, errmsg, err) {
-                        console.log("We have encountered an error: "+ errmsg);
-                        console.log(xhr.status + ": " + xhr.responseText);
-                    }
-                });
-            }
-
-            function deleteSite(id) {
-                $.ajax({
-                    url: "delete_site/",
-                    type: "POST",
-                    headers: {"X-CSRFToken": getCookie("csrftoken")},
-                    data: { "site_id" : id },
-                    success: function(json) {
-                        if(json.ok) {
-                            $("#site-" + id).remove();
-                        }
-                        $(".images").html("");
-                        page = pages = 1;
-			$("#pager").css("display","none");
-                    },
-                    error: function(xhr, errmsg, err) {
-                        console.log("We have encountered an error: "+ errmsg);
-                        console.log(xhr.status + ": " + xhr.responseText);
-                    }
-                });
-            }
+          });
+        }
         </script>
+      </div>
     </div>
-</div>
-</body>
+  </body>
 </html>
