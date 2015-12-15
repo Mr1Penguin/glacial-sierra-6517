@@ -9,7 +9,6 @@ WORKDIR /opt/app
 ADD requirements.txt /opt/app/
 RUN pip install -r requirements.txt
 ADD . /opt/app/
-RUN echo "0 2 * * * /opt/app/shedule.sh" >> /etc/cronta
+RUN echo "0 2 * * * /opt/app/shedule.sh" >> /etc/crontab
 RUN chmod +x /opt/app/run.sh
 CMD opt/app/run.sh
-RUN python -V
