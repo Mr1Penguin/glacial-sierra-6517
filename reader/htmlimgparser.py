@@ -12,6 +12,7 @@ from multiprocessing import Pool, Manager
 import time
 import numbers
 import gzip
+import ssl
 
 class HTMLImgParser(HTMLParser):
     def __init__(self, cursor, siteid, url):
@@ -87,21 +88,22 @@ def load_picture(src, root_url, isFav):
             src = "http:" + src
         try:
             if re.search("""^https?://""", src, flags = re.IGNORECASE) is None:
-                img = urllib2.urlopen("http://" + src)
+                img = urllib2.urlopen("http://" + src, context=ssl.SSLContext(ssl.PROTOCOL_TLSv1))
                 src = "http://" + src 
             else:
-                img = urllib2.urlopen(src)
+                img = urllib2.urlopen(src, context=ssl.SSLContext(ssl.PROTOCOL_TLSv1))
             picture = open_picture(img, src)
             if (not picture[0]):
                 raise Exception()
-        except Exception:
+        except Exception, e:
+            print e
             try:
                 parse_url = re.findall("(^.*/.*)\?.*", root_url, flags = re.IGNORECASE)
                 if parse_url:
                     new_root = parse_url[0]
                 else:
                     new_root = root_url
-                img = urllib2.urlopen(new_root + "/" + src)
+                img = urllib2.urlopen(new_root + "/" + src, context=ssl.SSLContext(ssl.PROTOCOL_TLSv1))
                 picture = open_picture(img, src)
                 if (not picture[0]):
                     raise Exception()
@@ -122,7 +124,7 @@ def load_picture(src, root_url, isFav):
                         else:
                             print "Fail with2", src
                             return [False, None, None]
-                        img = urllib2.urlopen(new_root2 + "/" + src)
+                        img = urllib2.urlopen(new_root2 + "/" + src, context=ssl.SSLContext(ssl.PROTOCOL_TLSv1))
                         picture = open_picture(img, src)
                         if (not picture[0]):
                             raise Exception()
