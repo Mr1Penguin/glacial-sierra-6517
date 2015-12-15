@@ -90,13 +90,21 @@
             <div id="site-{{ site.id }}" class="site">
               <img src="{{ site.favicon }}"  height=16/>
 	      {% if site.is_active %}
+	      {% if site.title != "" %}
               <a href="#" onclick="loadSite({{ site.id }})">{{ site.title }}</a>
+	      {% else %}
+	      <a href="#" onclick="loadSite({{ site.id }})">{{ site.url }}</a>
+	      {% endif %}
               <svg height="10" width="10" class="remove" onclick="deleteSite({{ site.id }})">
                 <line x1="0" y1="0" x2="10" y2="10" style="stroke:rgb(0,0,0);stroke-width:2" />
                 <line x1="0" y1="10" x2="10" y2="0" style="stroke:rgb(0,0,0);stroke-width:2" />
               </svg>
 	      {% else %}
+	      {% if site.title != "" %}
 	      <span style="color: #444">{{ site.title }}</span>
+	      {% else %}
+	      <span style="color: #444">{{ site.url }}</span>
+	      {% endif %}
 	      {% endif %}
             </div>
             {% endfor %}
@@ -171,7 +179,11 @@
             data: { "site_id": id },
             //fill div.images
             success: function(json) {
-              images = json;
+	      if(json.is_active) {
+		alert("Sorry, the site in progess.");
+		return;
+	      }
+              images = json.images;
               page = 1;
               pages = Math.ceil(images.length / 10);
               renderPage();
@@ -239,7 +251,7 @@
                 "href" : "#",
                 "onclick" : "loadSite(" + json.site_id + ")"
               });
-              a.text(json.title);
+              a.text(json.title == null ? url : json.title);
               var svg = "<svg width='10' height='10' class='remove' onclick='deleteSite(" + json.site_id + ")'><line x1='0' x2='10' y1='0' y2='10' style='stroke:rgb(0,0,0);stroke-width:2'/><line x1='0' x2='10' y1='10' y2='0' style='stroke:rgb(0,0,0);stroke-width:2'/></svg>"
               div.addClass("site");
               div.attr("id", "site-" + json.site_id);

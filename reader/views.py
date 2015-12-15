@@ -72,7 +72,11 @@ def collection(request):
                 for row in rows:
                     d = collections.OrderedDict()
                     d['id'] = row[0]
-                    d['title'] = row[1]
+                    if row[1] is None:
+                        d['title'] = ""
+                    else:
+                        d['title'] = row[1]
+                    d['url'] = row[2]
                     dd = row[2].split('/')
                     d['favicon'] = row[3] or (('http://' + dd[0] if dd[0] != 'http:' else dd[0] + '//' +  dd[2]) + '/favicon.ico')
                     d['is_active'] = row[4]
@@ -85,6 +89,12 @@ def collection(request):
 
 def load_site(request):
     if request.method == "GET":
+        curr.execute("select is_active from reader_sites whete id=(%s)", (request.GET.get('site_id'),))
+        if curr.rowcount == 1:
+            is_act = curr.fetchone()[0]
+        else:
+            is_act = False
+        response_json = "{ \"is_active\":" + json.dumps(is_act) + ", \"images\":"
         curr.execute("select url, width, id from reader_image where site_id=(%s) order by id", (request.GET.get('site_id'),))
         rows = curr.fetchall()
         sites = []
@@ -93,8 +103,8 @@ def load_site(request):
             t['url'] = row[0]
             t['width'] = row[1]
             sites.append(t)
-        sites_j = json.dumps(sites)
-        return HttpResponse(sites_j, content_type="application/json")
+        response_json += json.dumps(sites) + "}"
+        return HttpResponse(response_json, content_type="application/json")
 
 def add_site(request):
     if request.method == "POST":

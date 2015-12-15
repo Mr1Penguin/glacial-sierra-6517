@@ -96,7 +96,6 @@ def load_picture(src, root_url, isFav):
             if (not picture[0]):
                 raise Exception()
         except Exception, e:
-            print e
             try:
                 parse_url = re.findall("(^.*/.*)\?.*", root_url, flags = re.IGNORECASE)
                 if parse_url:
